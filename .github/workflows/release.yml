@@ -27,7 +27,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist/action
+          git add -f dist/action
           git diff --cached --quiet || git commit -m "build: bundle action for $GITHUB_REF_NAME"
           git push
       - name: Move the v1 major tag
