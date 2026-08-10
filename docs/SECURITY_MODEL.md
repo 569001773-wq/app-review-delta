@@ -19,6 +19,7 @@
 ## What the Action executes
 
 - its own bundled JavaScript (compiled from this repository at release time);
+- the bundle is fully self-contained — it has no runtime `node_modules` dependency (the small GitHub Actions runner surface — inputs, outputs, annotations, step summary — is implemented locally in `src/action/runner.ts`), and CI verifies this with a bundle-integrity check that fails on unbundled-dependency stubs;
 - `git` commands (local CLI only) that read objects: `rev-parse`, `diff`, `ls-tree`, `cat-file`, `show` — none of which run repository hooks or scripts;
 - no target: `npm install`, scripts, Expo CLI, EAS, Metro, Babel, TypeScript, tests, builds, Xcode, CocoaPods, Ruby, Fastlane, Makefiles, shell scripts, or config plugins.
 

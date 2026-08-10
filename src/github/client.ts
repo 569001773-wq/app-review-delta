@@ -1,4 +1,4 @@
-import { getOctokit } from '@actions/github';
+import { Octokit } from '@octokit/rest';
 
 interface CompareData {
   files?: Array<{
@@ -81,7 +81,9 @@ export class GitHubClient {
     private readonly repo: string,
     token: string | undefined,
   ) {
-    this.octokit = getOctokit(token ?? '');
+    this.octokit = new Octokit({
+      auth: token && token.length > 0 ? token : undefined,
+    }) as unknown as { rest: OctokitRest };
   }
 
   private async request<T>(fn: () => Promise<T>): Promise<T> {

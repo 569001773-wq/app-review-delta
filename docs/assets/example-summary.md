@@ -2,14 +2,14 @@
 
 **6 review-sensitive changes introduced by this PR**
 
-| Severity | Rule | Finding | File |
-|---|---|---|---|
-| WARNING | ARD003 | NSAllowsArbitraryLoads ATS exception enabled | `ios/DemoApp/Info.plist` |
-| WARNING | ARD004 | Permission purpose string is empty: NSMicrophoneUsageDescription | `ios/DemoApp/Info.plist` |
-| INFO | ARD004 | Permission surface introduced: NSMicrophoneUsageDescription | `ios/DemoApp/Info.plist` |
-| INFO | ARD005 | Background mode introduced: audio | `ios/DemoApp/Info.plist` |
-| INFO | ARD007 | Review-sensitive SDK added (purchases) | `package.json` |
-| INFO | ARD007 | Review-sensitive SDK added (tracking) | `package.json` |
+| Severity | Rule   | Finding                                                          | File                     |
+| -------- | ------ | ---------------------------------------------------------------- | ------------------------ |
+| WARNING  | ARD003 | NSAllowsArbitraryLoads ATS exception enabled                     | `ios/DemoApp/Info.plist` |
+| WARNING  | ARD004 | Permission purpose string is empty: NSMicrophoneUsageDescription | `ios/DemoApp/Info.plist` |
+| INFO     | ARD004 | Permission surface introduced: NSMicrophoneUsageDescription      | `ios/DemoApp/Info.plist` |
+| INFO     | ARD005 | Background mode introduced: audio                                | `ios/DemoApp/Info.plist` |
+| INFO     | ARD007 | Review-sensitive SDK added (purchases)                           | `package.json`           |
+| INFO     | ARD007 | Review-sensitive SDK added (tracking)                            | `package.json`           |
 
 ### WARNING · ARD003 · NSAllowsArbitraryLoads ATS exception enabled
 
@@ -56,7 +56,7 @@ _Source: [Information Property List: protected-resource usage descriptions (Appl
 
 **Before:** (not present)
 
-**After:** 
+**After:**
 
 fact: this PR adds NSMicrophoneUsageDescription (ios/DemoApp/Info.plist).
 

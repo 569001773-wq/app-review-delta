@@ -4,6 +4,13 @@ All notable changes to AppReviewDelta are documented here. The format follows [K
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-10
+
+### Fixed
+
+- **Critical: the published Action bundle crashed at startup on GitHub runners.** Current `@actions/*` toolkit majors are ESM-only and could not be bundled into the CommonJS Action bundle (ncc emitted runtime stubs); older majors pull in a vulnerable `undici` chain. The Action now has **no `@actions/*` runtime dependencies**: the small runner surface (inputs, outputs, annotations, step summary, `setFailed`) is implemented locally, and GitHub API access uses `@octokit/rest` directly. CI now verifies the bundle is self-contained (fails on unbundled-dependency stubs) and the Action was validated end-to-end from a separate synthetic consumer repository.
+- The context reader tolerates a UTF-8 BOM in the GitHub event file.
+
 ## [1.0.1] - 2026-08-10
 
 ### Fixed

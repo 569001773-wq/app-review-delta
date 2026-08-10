@@ -10,7 +10,7 @@ analyze(baseSnapshot, headSnapshot, config) -> AnalysisResult
 
 ```
 src/
-  action/        GitHub Action entry (reads pull_request context, REST client, annotations, job summary)
+  action/        GitHub Action entry (context reader, REST client, annotations, job summary; local runner-surface shim)
   cli/           Local CLI entry (git-object snapshot builder, commander)
   github/        GitHub REST client (compare, contents, blobs) + snapshot builder
   git/           Local git snapshot builder (git diff/show/cat-file; never executes project code)

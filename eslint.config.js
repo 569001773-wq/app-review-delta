@@ -30,4 +30,10 @@ module.exports = tseslint.config(
       '@typescript-eslint/no-require-imports': 'off',
     },
   },
+  {
+    files: ['scripts/**/*.mjs', 'scripts/**/*.js'],
+    languageOptions: {
+      globals: { process: 'readonly', console: 'readonly', __dirname: 'readonly' },
+    },
+  },
 );

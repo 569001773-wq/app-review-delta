@@ -24,6 +24,8 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run bundle:action
+      - name: Verify the Action bundle is self-contained
+        run: node scripts/check-bundle.mjs
       - name: Ensure committed bundle is up to date
         run: git diff --exit-code -- dist/action
       - run: npm audit --omit=dev

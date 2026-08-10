@@ -15,6 +15,7 @@ The scan reviewed the canonical include paths and exclusions listed below.
 - Runtime or test status: not recorded
 
 Limitations and exclusions:
+
 - Excluded node_modules/: Third-party dependencies; covered separately by npm audit (0 vulnerabilities).
 - Excluded dist/: Build output regenerated from src and re-verified by the CI bundle check.
 - Excluded test/: Fixtures intentionally contain synthetic credential values for scanner tests.
@@ -22,13 +23,13 @@ Limitations and exclusions:
 
 ### Scan Summary
 
-| Field | Value |
-| --- | --- |
-| Reportable findings | 0 |
-| Severity mix | none |
-| Confidence mix | none |
-| Coverage | complete |
-| Validation mode | not recorded |
+| Field               | Value        |
+| ------------------- | ------------ |
+| Reportable findings | 0            |
+| Severity mix        | none         |
+| Confidence mix      | none         |
+| Coverage            | complete     |
+| Validation mode     | not recorded |
 
 Canonical artifacts: `scan-manifest.json`, `findings.json`, and `coverage.json`. This report is a deterministic projection of those files.
 
@@ -44,9 +45,9 @@ No reportable findings survived the canonical discovery, validation, and reporta
 
 ## Reviewed Surfaces
 
-| Surface | Risk Area | Outcome | Notes |
-| --- | --- | --- | --- |
-| Untrusted-content parsers (plist, JSON, YAML, static Expo config) | not recorded | No issue found | Re-reviewed after null-prototype hardening; __proto__ fixture passes. |
+| Surface                                                               | Risk Area    | Outcome        | Notes                                                                                                               |
+| --------------------------------------------------------------------- | ------------ | -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Untrusted-content parsers (plist, JSON, YAML, static Expo config)     | not recorded | No issue found | Re-reviewed after null-prototype hardening; **proto** fixture passes.                                               |
 | GitHub Action entry, REST client, snapshot builder, engine, reporters | not recorded | No issue found | Includes new fork-PR routing (repoResolver, PR files fallback, per-ref client routing). Review found no new issues. |
-| Local git snapshot layer and working-tree reads | not recorded | No issue found | Size-before-read guards verified in all three providers. |
-| Rules, secret patterns, config schema, redaction | not recorded | No issue found | Redaction now covers evidence and base/head state fields. |
+| Local git snapshot layer and working-tree reads                       | not recorded | No issue found | Size-before-read guards verified in all three providers.                                                            |
+| Rules, secret patterns, config schema, redaction                      | not recorded | No issue found | Redaction now covers evidence and base/head state fields.                                                           |

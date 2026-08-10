@@ -1,18 +1,21 @@
-import * as core from '@actions/core';
-import { context } from '@actions/github';
 import { VERSION } from '../version';
 import { AppReviewConfig, configFromText, defaultConfig } from '../config/load';
 import { analyze } from '../engine';
 import { GitHubClient } from '../github/client';
 import { buildGitHubSnapshots } from '../github/githubSnapshot';
 import { resolvePullRequestRepos } from '../github/repoResolver';
+import { getGitHubContext } from '../github/context';
+import * as core from './runner';
 import { formatJson } from '../reporting/json';
 import { formatMarkdown } from '../reporting/markdown';
 import { formatTerminal, failsOn, findingCounts } from '../reporting/terminal';
 import * as fs from 'node:fs';
 
-function getPullRequestShas(): { baseSha: string; headSha: string } {
-  const pr = context.payload.pull_request as
+function getPullRequestShas(payload: { pull_request?: unknown }): {
+  baseSha: string;
+  headSha: string;
+} {
+  const pr = payload.pull_request as
     { base?: { sha?: string }; head?: { sha?: string } } | undefined;
   const baseSha = pr?.base?.sha;
   const headSha = pr?.head?.sha;
@@ -66,7 +69,8 @@ async function main(): Promise<void> {
     throw new Error('fail-on must be one of: error, warning, never');
   }
 
-  const { baseSha, headSha } = getPullRequestShas();
+  const context = getGitHubContext();
+  const { baseSha, headSha } = getPullRequestShas(context.payload);
   const { baseRepo, headRepo, prNumber } = resolvePullRequestRepos(context.payload, {
     owner: context.repo.owner,
     repo: context.repo.repo,

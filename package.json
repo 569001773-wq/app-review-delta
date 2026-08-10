@@ -42,9 +42,8 @@
     "prepublishOnly": "npm run build && npm run bundle:action"
   },
   "dependencies": {
-    "@actions/core": "^3.0.1",
-    "@actions/github": "^9.1.1",
     "@babel/parser": "^8.0.4",
+    "@octokit/rest": "^20.1.2",
     "commander": "^15.0.0",
     "fast-xml-parser": "^5.10.1",
     "picomatch": "^4.0.5",
