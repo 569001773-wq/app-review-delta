@@ -1,17 +1,21 @@
 # Pre-Release Security Scan — 2026-08-10
 
-AppReviewDelta was scanned with the Codex Security standard repository scan before release. This page records the result; canonical artifacts live in `docs/security/`.
+AppReviewDelta was scanned with the Codex Security standard repository scan before the v1.0.0 release and re-scanned before v1.0.1. This page records both results; canonical artifacts live in `docs/security/`.
 
-## Result
+## Re-scan before v1.0.1 (final state)
 
-- Scan mode: repository (prompt-only scan; desktop SDK scan tools were not available in the environment)
+- **Reportable findings: 0** (scan `scan_ard_polish_20260810`, coverage complete, prompt-only scan — desktop SDK scan tools were not available in the environment)
+- Reviewed surfaces: untrusted parsers, Action runtime + REST client + snapshot builder + engine + reporters (including new fork-PR routing), local git layer, rules/config/redaction.
+- Dependency audit: `npm audit` = 0 vulnerabilities.
+- Secret scan: no real credentials; only intentionally synthetic test fixtures.
+
+## v1.0.0 scan (first pass)
+
+- Scan mode: repository (prompt-only)
 - Coverage: complete for `src/`, `action.yml`, `.github/workflows`, `package.json` (exclusions: `node_modules/`, `dist/`, `test/` fixtures, `.git/`)
 - Findings: 4 (1 medium, 3 low) — **all fixed and verified before release**
-- Dependency audit: `npm audit` = 0 vulnerabilities
-- License review: all direct/indirect dependencies MIT/ISC/Apache-2.0 (MIT-compatible)
-- Secret scan: no real credentials; only intentionally synthetic test fixtures
 
-## Findings (all remediated)
+### Findings (all remediated)
 
 1. **CWE-1321 (medium)** — Attacker-controlled dictionary keys (`__proto__`) could pollute `Object.prototype` in plist/app-config/config parsing. Fixed with null-prototype objects; dedicated security fixture added.
 2. **CWE-400 (low)** — Oversized file content could be read before the size check in the git and GitHub providers. Fixed with size-before-read in all three providers.

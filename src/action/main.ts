@@ -5,6 +5,7 @@ import { AppReviewConfig, configFromText, defaultConfig } from '../config/load';
 import { analyze } from '../engine';
 import { GitHubClient } from '../github/client';
 import { buildGitHubSnapshots } from '../github/githubSnapshot';
+import { resolvePullRequestRepos } from '../github/repoResolver';
 import { formatJson } from '../reporting/json';
 import { formatMarkdown } from '../reporting/markdown';
 import { formatTerminal, failsOn, findingCounts } from '../reporting/terminal';
@@ -66,19 +67,29 @@ async function main(): Promise<void> {
   }
 
   const { baseSha, headSha } = getPullRequestShas();
-  const owner = context.repo.owner;
-  const repo = context.repo.repo;
-  const client = new GitHubClient(owner, repo, token || undefined);
+  const { baseRepo, headRepo, prNumber } = resolvePullRequestRepos(context.payload, {
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+  });
+  const baseClient = new GitHubClient(baseRepo.owner, baseRepo.repo, token || undefined);
+  const headClient = new GitHubClient(headRepo.owner, headRepo.repo, token || undefined);
 
   const config = await loadConfigFromRepo(
-    client,
+    headClient,
     headSha,
     configPath,
     failOnInput,
     Number.isFinite(maxFileSizeInput) && maxFileSizeInput > 0 ? maxFileSizeInput : undefined,
   );
 
-  const { base, head } = await buildGitHubSnapshots(client, baseSha, headSha, config);
+  const { base, head } = await buildGitHubSnapshots({
+    baseClient,
+    headClient,
+    baseSha,
+    headSha,
+    config,
+    prNumber,
+  });
   const result = analyze(base, head, config, { version: VERSION });
 
   const counts = findingCounts(result);

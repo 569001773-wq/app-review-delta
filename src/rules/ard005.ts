@@ -57,7 +57,7 @@ export const ARD005: Rule = {
         out.push({
           title: `Background mode introduced: ${mode}`,
           severity: effectiveSeverity(highScrutiny ? 'WARNING' : 'INFO', ctx.config, 'ARD005'),
-          confidence: 'MEDIUM',
+          confidence: 'HIGH',
           category: 'background',
           file: src.file,
           evidence: `UIBackgroundModes adds "${mode}" in ${src.label}.`,

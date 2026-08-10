@@ -4,7 +4,7 @@
 
 ## Design invariants
 
-1. **No target checkout.** The Action does not check out or clone the target repository. It reads the `pull_request` event payload, the compare response, and individual file contents through the GitHub REST API.
+1. **No target checkout.** The Action does not check out or clone the target repository. It reads the `pull_request` event payload, the compare response (or the PR files API for fork PRs), and individual file contents through the GitHub REST API. Head-side reads are routed to the fork repository (`pull_request.head.repo`) when the PR comes from a fork. If the workflow token cannot read the fork (for example a private fork), the check stops with a clear, actionable message instead of reporting partial results.
 2. **Target code is data.** No target file is ever executed, imported, `require`d, or `eval`ed. Configuration files are parsed as syntax trees or data:
    - XML plists via a DOM-style parser with a tag-balance guard;
    - JSON via `JSON.parse`;

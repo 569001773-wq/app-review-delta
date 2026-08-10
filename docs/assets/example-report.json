@@ -38,7 +38,7 @@
       "suggestedAction": "Provide a clear, specific purpose string for the permission.",
       "officialSource": {
         "title": "Information Property List: protected-resource usage descriptions (Apple Developer)",
-        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list/protected_resources"
+        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list"
       },
       "introducedByPR": true,
       "fingerprint": "bddc0ff104196d4b834cf7f2",
@@ -59,7 +59,7 @@
       "suggestedAction": "Confirm the permission is actually used and the purpose string is clear and specific.",
       "officialSource": {
         "title": "Information Property List: protected-resource usage descriptions (Apple Developer)",
-        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list/protected_resources"
+        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list"
       },
       "introducedByPR": true,
       "fingerprint": "241ed9acaf59507ea3df0106",
@@ -70,7 +70,7 @@
       "ruleId": "ARD005",
       "title": "Background mode introduced: audio",
       "severity": "INFO",
-      "confidence": "MEDIUM",
+      "confidence": "HIGH",
       "category": "background",
       "file": "ios/DemoApp/Info.plist",
       "evidence": "UIBackgroundModes adds \"audio\" in ios/DemoApp/Info.plist.",
@@ -189,7 +189,7 @@
       "notes": []
     }
   },
-  "durationMs": 11,
+  "durationMs": 19,
   "config": {
     "failOn": "error",
     "ruleOverrides": {}

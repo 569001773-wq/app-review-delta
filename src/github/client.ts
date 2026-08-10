@@ -29,9 +29,20 @@ interface OctokitRest {
     compareCommits: (params: any) => Promise<{ data: CompareData }>;
     getContent: (params: any) => Promise<{ data: ContentData | ContentData[] }>;
   };
+  pulls: {
+    listFiles: (params: any) => Promise<{ data: PullRequestFileData[] }>;
+  };
   git: {
     getBlob: (params: any) => Promise<{ data: BlobData }>;
   };
+}
+
+interface PullRequestFileData {
+  filename?: string;
+  status?: string;
+  additions?: number;
+  deletions?: number;
+  changes?: number;
 }
 
 export interface ChangedFileInfo {
@@ -43,6 +54,12 @@ export interface ChangedFileInfo {
 }
 
 export interface CompareResult {
+  files: ChangedFileInfo[];
+  truncated: boolean;
+  notes: string[];
+}
+
+export interface PullRequestFilesResult {
   files: ChangedFileInfo[];
   truncated: boolean;
   notes: string[];
@@ -125,6 +142,53 @@ export class GitHubClient {
       );
     }
     return { files, truncated, notes };
+  }
+
+  /**
+   * Lists the files changed by a pull request. PR-scoped, so it works for
+   * cross-repository (fork) pull requests where compare may not.
+   */
+  async listPullRequestFiles(prNumber: number, maxPages = 3): Promise<PullRequestFilesResult> {
+    const files: ChangedFileInfo[] = [];
+    const notes: string[] = [];
+    let truncated = false;
+    let sawFullPage = false;
+    for (let page = 1; page <= maxPages; page++) {
+      const data = await this.request(() =>
+        this.octokit.rest.pulls
+          .listFiles({
+            owner: this.owner,
+            repo: this.repo,
+            pull_number: prNumber,
+            per_page: 100,
+            page,
+          })
+          .then((r) => r.data),
+      );
+      for (const f of data) {
+        if (!f.filename) continue;
+        files.push({
+          path: f.filename,
+          status: f.status ?? 'modified',
+          additions: f.additions ?? 0,
+          deletions: f.deletions ?? 0,
+          changes: f.changes ?? 0,
+        });
+      }
+      sawFullPage = data.length >= 100;
+      if (data.length < 100) break;
+    }
+    if (sawFullPage) {
+      truncated = true;
+      notes.push(
+        'pull-request files response reached the pagination limit; changed-file coverage may be partial',
+      );
+    }
+    return { files, truncated, notes };
+  }
+
+  getRepoId(): string {
+    return `${this.owner}/${this.repo}`;
   }
 
   async getFile(path: string, ref: string, maxFileSize = 2 * 1024 * 1024): Promise<FetchedFile> {

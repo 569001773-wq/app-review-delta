@@ -11,7 +11,7 @@ import { fingerprintOf } from '../util/hash';
 
 const SOURCE = {
   title: 'Information Property List: protected-resource usage descriptions (Apple Developer)',
-  url: 'https://developer.apple.com/documentation/bundleresources/information-property-list/protected_resources',
+  url: 'https://developer.apple.com/documentation/bundleresources/information-property-list',
 };
 
 const TRACKED_KEYS = [

@@ -1,7 +1,7 @@
 {
   "documentType": "codex-security.coverage",
   "schemaVersion": "1.0",
-  "scanId": "scan_ard_20260810",
+  "scanId": "scan_ard_polish_20260810",
   "mode": "repository",
   "completeness": "complete",
   "inventoryStrategy": "directory",
@@ -11,26 +11,30 @@
     {
       "id": "surface_untrusted_parsers",
       "label": "Untrusted-content parsers (plist, JSON, YAML, static Expo config)",
-      "disposition": "reported",
-      "receiptRefs": []
+      "disposition": "no_issue_found",
+      "receiptRefs": [],
+      "notes": "Re-reviewed after null-prototype hardening; __proto__ fixture passes."
     },
     {
       "id": "surface_action_runtime",
       "label": "GitHub Action entry, REST client, snapshot builder, engine, reporters",
-      "disposition": "reported",
-      "receiptRefs": []
+      "disposition": "no_issue_found",
+      "receiptRefs": [],
+      "notes": "Includes new fork-PR routing (repoResolver, PR files fallback, per-ref client routing). Review found no new issues."
     },
     {
       "id": "surface_local_git_layer",
       "label": "Local git snapshot layer and working-tree reads",
-      "disposition": "reported",
-      "receiptRefs": []
+      "disposition": "no_issue_found",
+      "receiptRefs": [],
+      "notes": "Size-before-read guards verified in all three providers."
     },
     {
       "id": "surface_rules_and_config",
       "label": "Rules, secret patterns, config schema, redaction",
-      "disposition": "reported",
-      "receiptRefs": []
+      "disposition": "no_issue_found",
+      "receiptRefs": [],
+      "notes": "Redaction now covers evidence and base/head state fields."
     }
   ],
   "explicitExclusions": [

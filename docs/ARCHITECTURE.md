@@ -37,7 +37,7 @@ interface Snapshot {
 
 Relevant paths are a small, documented set: root `package.json` and lockfiles, `app.json`/`app.config.*`, `eas.json`, `Info.plist`/plists under `ios/`, `*.entitlements`, `*.xcprivacy`, committed `.env*` files, and secret-shaped filenames. Everything else in the repository is ignored.
 
-The GitHub source fetches the compare response (paginated, with truncation detection) and then individual file contents via the contents API, falling back to the Git blobs API for large files. The git source reads blobs with `git cat-file`/`git ls-tree` using literal pathspecs; symlinks are never followed.
+The GitHub source fetches the compare response (paginated, with truncation detection) and then individual file contents via the contents API, falling back to the Git blobs API for large files. Base-side reads use the base repository; head-side reads use `pull_request.head.repo`, so fork PRs are analyzed against the fork without a checkout. When cross-repository compare is unavailable, the changed-file list comes from the PR files API. The git source reads blobs with `git cat-file`/`git ls-tree` using literal pathspecs; symlinks are never followed.
 
 ## Static Expo config
 

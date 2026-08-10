@@ -19,6 +19,7 @@ AppReviewDelta is a narrow, static, differential tool. It is honest about what i
 - **Lockfile scope.** ARD007 reads the root `package.json` (dependencies + devDependencies); transitive dependencies are not classified in V1.
 - **File scope.** Only the documented relevant-path set is fetched. Code-level review risks (e.g., a new API call in Swift) are not analyzed in V1.
 - **Redaction is pattern-based.** Unknown credential formats could in principle pass through; the redactor covers the private formats the tool detects.
+- **Fork pull requests.** Public forks are analyzed with the default `GITHUB_TOKEN`. For private forks, the workflow token must be able to read the fork; if it cannot, the check stops with a clear message rather than reporting partial results.
 
 ## False-positive policy
 
