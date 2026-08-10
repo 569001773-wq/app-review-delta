@@ -1,6 +1,6 @@
 {
   "name": "app-review-delta",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Detect iOS release-review risks introduced by a pull request. Base-to-head static analysis for Expo / React Native / iOS projects. No target checkout, no project execution, no source upload, no AI key.",
   "license": "MIT",
   "keywords": [

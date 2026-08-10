@@ -4,6 +4,11 @@ All notable changes to AppReviewDelta are documented here. The format follows [K
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-08-10
+
+### Fixed
+
+- Version-string consistency: `app-review-delta --version`, the JSON report `version` field, and the package version now report `1.0.3` (they previously reported `1.0.0`).
 - Hardened the fork-PR files fallback: if the PR files API also fails (for example a private fork the token cannot read), the check now reports a clear, actionable message instead of a raw API error.
 
 ## [1.0.2] - 2026-08-10
