@@ -4,6 +4,8 @@ All notable changes to AppReviewDelta are documented here. The format follows [K
 
 ## [Unreleased]
 
+- Hardened the fork-PR files fallback: if the PR files API also fails (for example a private fork the token cannot read), the check now reports a clear, actionable message instead of a raw API error.
+
 ## [1.0.2] - 2026-08-10
 
 ### Fixed

@@ -1,7 +1,7 @@
 {
   "documentType": "codex-security.coverage",
   "schemaVersion": "1.0",
-  "scanId": "scan_ard_polish_20260810",
+  "scanId": "scan_ard_final_20260810",
   "mode": "repository",
   "completeness": "complete",
   "inventoryStrategy": "directory",
@@ -13,14 +13,14 @@
       "label": "Untrusted-content parsers (plist, JSON, YAML, static Expo config)",
       "disposition": "no_issue_found",
       "receiptRefs": [],
-      "notes": "Re-reviewed after null-prototype hardening; __proto__ fixture passes."
+      "notes": "Null-prototype hardening and __proto__ fixture verified."
     },
     {
       "id": "surface_action_runtime",
-      "label": "GitHub Action entry, REST client, snapshot builder, engine, reporters",
+      "label": "GitHub Action entry, runner shim, context reader, REST client, snapshot builder, engine, reporters",
       "disposition": "no_issue_found",
       "receiptRefs": [],
-      "notes": "Includes new fork-PR routing (repoResolver, PR files fallback, per-ref client routing). Review found no new issues."
+      "notes": "Includes the self-contained runner shim (src/action/runner.ts), BOM-tolerant context reader, @octokit/rest client, and fork-PR routing with PR-files fallback. Review found no new issues."
     },
     {
       "id": "surface_local_git_layer",
@@ -34,7 +34,7 @@
       "label": "Rules, secret patterns, config schema, redaction",
       "disposition": "no_issue_found",
       "receiptRefs": [],
-      "notes": "Redaction now covers evidence and base/head state fields."
+      "notes": "Redaction covers evidence and base/head state fields; ARD005 confidence aligned."
     }
   ],
   "explicitExclusions": [

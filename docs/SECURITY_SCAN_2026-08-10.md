@@ -1,6 +1,13 @@
 # Pre-Release Security Scan — 2026-08-10
 
-AppReviewDelta was scanned with the Codex Security standard repository scan before the v1.0.0 release and re-scanned before v1.0.1. This page records both results; canonical artifacts live in `docs/security/`.
+AppReviewDelta was scanned with the Codex Security standard repository scan before the v1.0.0 release and re-scanned before v1.0.1 and v1.0.2. This page records the results; canonical artifacts (current final scan) live in `docs/security/`.
+
+## Final scan before v1.0.2 (current state)
+
+- **Reportable findings: 0** (scan `scan_ard_final_20260810`, coverage complete, prompt-only scan — desktop SDK scan tools were not available in the environment)
+- Reviewed surfaces include the self-contained runner shim, BOM-tolerant context reader, `@octokit/rest` client, and fork-PR routing with PR-files fallback.
+- Dependency audit: `npm audit` = 0 vulnerabilities (no `@actions/*` runtime dependencies; no vulnerable `undici` chain).
+- Secret scan: no real credentials; only intentionally synthetic test fixtures.
 
 ## Re-scan before v1.0.1 (final state)
 

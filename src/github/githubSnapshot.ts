@@ -1,7 +1,7 @@
 import { AppReviewConfig } from '../config/load';
 import { buildSnapshot, FileProvider, ChangedPathsProvider } from '../snapshots/buildSnapshot';
 import { Snapshot } from '../types';
-import { CompareResult, GitHubClient } from './client';
+import { CompareResult, GitHubClient, PullRequestFilesResult } from './client';
 
 export interface GitHubSnapshotInput {
   baseClient: GitHubClient;
@@ -28,7 +28,18 @@ export async function buildGitHubSnapshots(
     if (prNumber === undefined) throw err;
     // Cross-repository (fork) pull requests cannot always be compared on the
     // base repository; the PR-scoped files API is the reliable fallback.
-    const prFiles = await baseClient.listPullRequestFiles(prNumber, config.maxComparePages);
+    let prFiles: PullRequestFilesResult;
+    try {
+      prFiles = await baseClient.listPullRequestFiles(prNumber, config.maxComparePages);
+    } catch (prErr) {
+      const status = (prErr as { status?: number }).status ?? 0;
+      throw new Error(
+        `AppReviewDelta could not list files for pull request #${prNumber} on ${baseClient.getRepoId()} ` +
+          `(HTTP ${status || 'error'}). For fork pull requests, the workflow token needs read access to the fork ` +
+          'repository; public forks work with the default GITHUB_TOKEN.',
+        { cause: prErr },
+      );
+    }
     compare = {
       files: prFiles.files,
       truncated: prFiles.truncated,
