@@ -1,0 +1,64 @@
+{
+  "name": "app-review-delta",
+  "version": "1.0.0",
+  "description": "Detect iOS release-review risks introduced by a pull request. Base-to-head static analysis for Expo / React Native / iOS projects. No target checkout, no project execution, no source upload, no AI key.",
+  "license": "MIT",
+  "keywords": [
+    "ios",
+    "expo",
+    "react-native",
+    "app-store",
+    "app-review",
+    "github-actions",
+    "ci",
+    "mobile-development",
+    "static-analysis"
+  ],
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "bin": {
+    "app-review-delta": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "action.yml",
+    "README.md",
+    "LICENSE",
+    "docs"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "bundle:action": "ncc build src/action/main.ts -o dist/action --minify --license licenses.txt",
+    "pack": "npm pack --dry-run",
+    "prepublishOnly": "npm run build && npm run bundle:action"
+  },
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/github": "^9.1.1",
+    "@babel/parser": "^8.0.4",
+    "commander": "^15.0.0",
+    "fast-xml-parser": "^5.10.1",
+    "picomatch": "^4.0.5",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.10.0",
+    "@types/picomatch": "^4.0.3",
+    "@vercel/ncc": "^0.44.1",
+    "eslint": "^10.8.1",
+    "prettier": "^3.9.6",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10"
+  }
+}

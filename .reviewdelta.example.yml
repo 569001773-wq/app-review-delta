@@ -1,0 +1,50 @@
+# AppReviewDelta configuration (optional).
+# Place at the repository root as .reviewdelta.yml.
+
+# Fail the CI run when findings at or above this level are introduced.
+# error (default) | warning | never
+fail-on: error
+
+# Per-rule control. Severity overrides are supported but should be rare;
+# lowering a severity below the rule default reduces the CI gate.
+rules:
+  ARD001:
+    enabled: true
+  ARD002:
+    enabled: true
+  ARD003:
+    enabled: true
+  ARD004:
+    enabled: true
+  ARD005:
+    enabled: true
+  ARD006:
+    enabled: true
+  ARD007:
+    enabled: true
+  ARD008:
+    enabled: true
+
+# Paths excluded from analysis (glob, relative to the repository root).
+exclude-paths:
+  - '**/Pods/**'
+  - '**/node_modules/**'
+  - '**/build/**'
+
+# Suppressions must include a reason. Optionally set an expiry date; expired
+# suppressions stop applying and the finding becomes visible again.
+ignore:
+  - rule: ARD005
+    path: 'ios/**'
+    reason: 'Background audio is an intentional, documented feature.'
+    expires: '2026-12-01'
+
+# Privacy manifest reason-code validation mode.
+# lenient (default): reason codes in the documented format but outside the
+#   checked-version table are WARNING MEDIUM confidence (Apple updates the list).
+# strict: the same mismatch becomes ERROR HIGH confidence.
+privacy-manifest:
+  reason-code-mode: lenient
+
+# Safety limits.
+max-file-size-bytes: 2097152

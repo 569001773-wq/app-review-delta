@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="828" height="2144" viewBox="0 0 828 2144">
+  <rect width="100%" height="100%" rx="10" fill="#0d1117"/>
+  <rect x="0" y="0" width="100%" height="34" rx="10" fill="#161b22"/>
+  <circle cx="22" cy="17" r="7" fill="#ff5f56"/><circle cx="42" cy="17" r="7" fill="#ffbd2e"/><circle cx="62" cy="17" r="7" fill="#27c93f"/>
+  <text x="80" y="23" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#8b949e">app-review-delta check --base base --head head</text>
+  <text x="18" y="26" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">﻿AppReviewDelta</text>
+<text x="18" y="46" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">──────────────────────────────</text>
+<text x="18" y="66" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9" font-weight="600">6 review-sensitive changes introduced by this PR</text>
+<text x="18" y="86" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="106" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#e8b339" font-weight="600">WARNING · ARD003</text>
+<text x="18" y="126" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">NSAllowsArbitraryLoads ATS exception enabled</text>
+<text x="18" y="146" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="166" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">ios/DemoApp/Info.plist</text>
+<text x="18" y="186" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="206" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">(not present) → true</text>
+<text x="18" y="226" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="246" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confidence: HIGH</text>
+<text x="18" y="266" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="286" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Why this matters:</text>
+<text x="18" y="306" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Apple documents that a justification must be supplied during App Store review when NSAllowsArbitraryLoads is YES.</text>
+<text x="18" y="326" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="346" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Suggested action:</text>
+<text x="18" y="366" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Use a narrower exception (NSExceptionDomains) if possible, or prepare a clear review justification.</text>
+<text x="18" y="386" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="406" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">──────────────────────────────</text>
+<text x="18" y="426" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="446" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#e8b339" font-weight="600">WARNING · ARD004</text>
+<text x="18" y="466" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Permission purpose string is empty: NSMicrophoneUsageDescription</text>
+<text x="18" y="486" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="506" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">ios/DemoApp/Info.plist</text>
+<text x="18" y="526" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="546" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">(not present) → (empty string)</text>
+<text x="18" y="566" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="586" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confidence: HIGH</text>
+<text x="18" y="606" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="626" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Why this matters:</text>
+<text x="18" y="646" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Apple requires a message that tells people why the app requests access; an empty or placeholder string fails that purpose.</text>
+<text x="18" y="666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="686" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Suggested action:</text>
+<text x="18" y="706" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Provide a clear, specific purpose string for the permission.</text>
+<text x="18" y="726" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="746" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">──────────────────────────────</text>
+<text x="18" y="766" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="786" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#58a6ff" font-weight="600">INFO · ARD004</text>
+<text x="18" y="806" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Permission surface introduced: NSMicrophoneUsageDescription</text>
+<text x="18" y="826" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="846" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">ios/DemoApp/Info.plist</text>
+<text x="18" y="866" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="886" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">(not present) → (empty string)</text>
+<text x="18" y="906" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="926" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confidence: HIGH</text>
+<text x="18" y="946" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="966" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Why this matters:</text>
+<text x="18" y="986" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">A new protected-resource permission changes the App Store review surface and the user-facing permission prompt.</text>
+<text x="18" y="1006" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1026" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Suggested action:</text>
+<text x="18" y="1046" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confirm the permission is actually used and the purpose string is clear and specific.</text>
+<text x="18" y="1066" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1086" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">──────────────────────────────</text>
+<text x="18" y="1106" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1126" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#58a6ff" font-weight="600">INFO · ARD005</text>
+<text x="18" y="1146" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Background mode introduced: audio</text>
+<text x="18" y="1166" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1186" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">ios/DemoApp/Info.plist</text>
+<text x="18" y="1206" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1226" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">(not present) → audio</text>
+<text x="18" y="1246" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1266" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confidence: MEDIUM</text>
+<text x="18" y="1286" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1306" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Why this matters:</text>
+<text x="18" y="1326" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Apple limits background execution to intended purposes. A new background mode is a review-sensitive capability that should match actual app behavior.</text>
+<text x="18" y="1346" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1366" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Suggested action:</text>
+<text x="18" y="1386" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confirm the background mode is required and matches the app functionality described to reviewers.</text>
+<text x="18" y="1406" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1426" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">──────────────────────────────</text>
+<text x="18" y="1446" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1466" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#58a6ff" font-weight="600">INFO · ARD007</text>
+<text x="18" y="1486" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Review-sensitive SDK added (purchases)</text>
+<text x="18" y="1506" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1526" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">package.json</text>
+<text x="18" y="1546" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1566" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">(not present) → react-native-purchases</text>
+<text x="18" y="1586" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1606" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confidence: HIGH</text>
+<text x="18" y="1626" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1646" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Why this matters:</text>
+<text x="18" y="1666" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Purchase, advertising, tracking, analytics, social-auth, and AI/data-processing SDKs are categories App Review and privacy processes look at closely.</text>
+<text x="18" y="1686" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1706" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Suggested action:</text>
+<text x="18" y="1726" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confirm the SDK is required, and update App Privacy / review materials if the data surface changes.</text>
+<text x="18" y="1746" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1766" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">──────────────────────────────</text>
+<text x="18" y="1786" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1806" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#58a6ff" font-weight="600">INFO · ARD007</text>
+<text x="18" y="1826" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Review-sensitive SDK added (tracking)</text>
+<text x="18" y="1846" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1866" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">package.json</text>
+<text x="18" y="1886" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1906" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">(not present) → react-native-tracking-transparency</text>
+<text x="18" y="1926" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1946" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confidence: HIGH</text>
+<text x="18" y="1966" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="1986" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Why this matters:</text>
+<text x="18" y="2006" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Purchase, advertising, tracking, analytics, social-auth, and AI/data-processing SDKs are categories App Review and privacy processes look at closely.</text>
+<text x="18" y="2026" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="2046" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Suggested action:</text>
+<text x="18" y="2066" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">Confirm the SDK is required, and update App Privacy / review materials if the data surface changes.</text>
+<text x="18" y="2086" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+<text x="18" y="2106" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9">──────────────────────────────</text>
+<text x="18" y="2126" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#c9d1d9"></text>
+</svg>

@@ -1,0 +1,55 @@
+{
+  "documentType": "codex-security.coverage",
+  "schemaVersion": "1.0",
+  "scanId": "scan_ard_20260810",
+  "mode": "repository",
+  "completeness": "complete",
+  "inventoryStrategy": "directory",
+  "includePaths": ["."],
+  "excludePaths": ["node_modules/", "dist/", ".git/", "test/"],
+  "surfaces": [
+    {
+      "id": "surface_untrusted_parsers",
+      "label": "Untrusted-content parsers (plist, JSON, YAML, static Expo config)",
+      "disposition": "reported",
+      "receiptRefs": []
+    },
+    {
+      "id": "surface_action_runtime",
+      "label": "GitHub Action entry, REST client, snapshot builder, engine, reporters",
+      "disposition": "reported",
+      "receiptRefs": []
+    },
+    {
+      "id": "surface_local_git_layer",
+      "label": "Local git snapshot layer and working-tree reads",
+      "disposition": "reported",
+      "receiptRefs": []
+    },
+    {
+      "id": "surface_rules_and_config",
+      "label": "Rules, secret patterns, config schema, redaction",
+      "disposition": "reported",
+      "receiptRefs": []
+    }
+  ],
+  "explicitExclusions": [
+    {
+      "pattern": "node_modules/",
+      "reason": "Third-party dependencies; covered separately by npm audit (0 vulnerabilities)."
+    },
+    {
+      "pattern": "dist/",
+      "reason": "Build output regenerated from src and re-verified by the CI bundle check."
+    },
+    {
+      "pattern": "test/",
+      "reason": "Fixtures intentionally contain synthetic credential values for scanner tests."
+    },
+    {
+      "pattern": ".git/",
+      "reason": "Repository history is not reviewed by design."
+    }
+  ],
+  "deferred": []
+}

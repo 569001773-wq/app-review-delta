@@ -1,0 +1,50 @@
+name: 'App Review Delta'
+description: >-
+  Detect iOS release-review risks introduced by a pull request.
+  Static base-to-head analysis for Expo / React Native / iOS projects.
+  No target checkout, no project execution, no source upload, no AI key.
+author: 'AppReviewDelta maintainer'
+inputs:
+  token:
+    description: >-
+      GitHub token used to read the repository. Defaults to the automatic
+      GITHUB_TOKEN, which requires only read permissions.
+    required: false
+    default: ${{ github.token }}
+  fail-on:
+    description: >-
+      Which finding level fails the build: error (default), warning, or never.
+    required: false
+    default: error
+  config-path:
+    description: >-
+      Path to the configuration file (.reviewdelta.yml) inside the repository.
+      If not found, defaults are used.
+    required: false
+    default: '.reviewdelta.yml'
+  max-file-size-bytes:
+    description: >-
+      Maximum file size (bytes) to fetch and analyze. Larger files are skipped
+      and reported as a coverage gap.
+    required: false
+    default: '2097152'
+  output-json:
+    description: >-
+      Write a full JSON report to this path inside the runner workspace.
+    required: false
+    default: ''
+outputs:
+  introduced-count:
+    description: 'Number of review-sensitive changes introduced by this PR.'
+  error-count:
+    description: 'Number of introduced ERROR findings.'
+  warning-count:
+    description: 'Number of introduced WARNING findings.'
+  info-count:
+    description: 'Number of introduced INFO findings.'
+runs:
+  using: node24
+  main: dist/action/index.js
+branding:
+  icon: 'activity'
+  color: 'purple'

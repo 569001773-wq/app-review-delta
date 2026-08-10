@@ -1,0 +1,197 @@
+﻿{
+  "tool": "AppReviewDelta",
+  "version": "1.0.0",
+  "baseRef": "bb8550aa3c2c2480e997d26c507b177173690128",
+  "headRef": "6aa82a65d0e241fda033bac1a8bfa99b2c08eee3",
+  "findings": [
+    {
+      "ruleId": "ARD003",
+      "title": "NSAllowsArbitraryLoads ATS exception enabled",
+      "severity": "WARNING",
+      "confidence": "HIGH",
+      "category": "network",
+      "file": "ios/DemoApp/Info.plist",
+      "evidence": "NSAllowsArbitraryLoads:\n(not present) -> true",
+      "baseState": "(not present)",
+      "headState": "true",
+      "whyItMatters": "Apple documents that a justification must be supplied during App Store review when NSAllowsArbitraryLoads is YES.",
+      "suggestedAction": "Use a narrower exception (NSExceptionDomains) if possible, or prepare a clear review justification.",
+      "officialSource": {
+        "title": "NSAllowsArbitraryLoads | NSAppTransportSecurity",
+        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list/nsapptransportsecurity/nsallowsarbitraryloads"
+      },
+      "introducedByPR": true,
+      "fingerprint": "dbb4e58cd93f2597b28b4115",
+      "semanticKey": "ats:NSAppTransportSecurity.NSAllowsArbitraryLoads",
+      "preExisting": false
+    },
+    {
+      "ruleId": "ARD004",
+      "title": "Permission purpose string is empty: NSMicrophoneUsageDescription",
+      "severity": "WARNING",
+      "confidence": "HIGH",
+      "category": "permissions",
+      "file": "ios/DemoApp/Info.plist",
+      "evidence": "fact: NSMicrophoneUsageDescription changed in ios/DemoApp/Info.plist.",
+      "headState": "(empty string)",
+      "whyItMatters": "Apple requires a message that tells people why the app requests access; an empty or placeholder string fails that purpose.",
+      "suggestedAction": "Provide a clear, specific purpose string for the permission.",
+      "officialSource": {
+        "title": "Information Property List: protected-resource usage descriptions (Apple Developer)",
+        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list/protected_resources"
+      },
+      "introducedByPR": true,
+      "fingerprint": "bddc0ff104196d4b834cf7f2",
+      "semanticKey": "permission-quality:NSMicrophoneUsageDescription",
+      "preExisting": false,
+      "heuristic": false
+    },
+    {
+      "ruleId": "ARD004",
+      "title": "Permission surface introduced: NSMicrophoneUsageDescription",
+      "severity": "INFO",
+      "confidence": "HIGH",
+      "category": "permissions",
+      "file": "ios/DemoApp/Info.plist",
+      "evidence": "fact: this PR adds NSMicrophoneUsageDescription (ios/DemoApp/Info.plist).",
+      "headState": "",
+      "whyItMatters": "A new protected-resource permission changes the App Store review surface and the user-facing permission prompt.",
+      "suggestedAction": "Confirm the permission is actually used and the purpose string is clear and specific.",
+      "officialSource": {
+        "title": "Information Property List: protected-resource usage descriptions (Apple Developer)",
+        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list/protected_resources"
+      },
+      "introducedByPR": true,
+      "fingerprint": "241ed9acaf59507ea3df0106",
+      "semanticKey": "permission-added:NSMicrophoneUsageDescription",
+      "preExisting": false
+    },
+    {
+      "ruleId": "ARD005",
+      "title": "Background mode introduced: audio",
+      "severity": "INFO",
+      "confidence": "MEDIUM",
+      "category": "background",
+      "file": "ios/DemoApp/Info.plist",
+      "evidence": "UIBackgroundModes adds \"audio\" in ios/DemoApp/Info.plist.",
+      "headState": "audio",
+      "whyItMatters": "Apple limits background execution to intended purposes. A new background mode is a review-sensitive capability that should match actual app behavior.",
+      "suggestedAction": "Confirm the background mode is required and matches the app functionality described to reviewers.",
+      "officialSource": {
+        "title": "UIBackgroundModes | Configuring background execution modes",
+        "url": "https://developer.apple.com/documentation/bundleresources/information-property-list/uibackgroundmodes"
+      },
+      "introducedByPR": true,
+      "fingerprint": "7f864a0ba074c230ef99976c",
+      "semanticKey": "background-mode:audio",
+      "preExisting": false
+    },
+    {
+      "ruleId": "ARD007",
+      "title": "Review-sensitive SDK added (purchases)",
+      "severity": "INFO",
+      "confidence": "HIGH",
+      "category": "sdk",
+      "file": "package.json",
+      "evidence": "This PR adds \"react-native-purchases\" (in-app purchases or subscriptions) to package.json dependencies. App Store review/privacy/payment surfaces may have changed.",
+      "headState": "react-native-purchases",
+      "whyItMatters": "Purchase, advertising, tracking, analytics, social-auth, and AI/data-processing SDKs are categories App Review and privacy processes look at closely.",
+      "suggestedAction": "Confirm the SDK is required, and update App Privacy / review materials if the data surface changes.",
+      "officialSource": {
+        "title": "App Store Review Guidelines (privacy and payments sections)",
+        "url": "https://developer.apple.com/app-store/review/guidelines/"
+      },
+      "introducedByPR": true,
+      "fingerprint": "2b34930f166ef54e516357ec",
+      "semanticKey": "sdk:purchases:react-native-purchases",
+      "preExisting": false
+    },
+    {
+      "ruleId": "ARD007",
+      "title": "Review-sensitive SDK added (tracking)",
+      "severity": "INFO",
+      "confidence": "HIGH",
+      "category": "sdk",
+      "file": "package.json",
+      "evidence": "This PR adds \"react-native-tracking-transparency\" (tracking or attribution SDKs) to package.json dependencies. App Store review/privacy/payment surfaces may have changed.",
+      "headState": "react-native-tracking-transparency",
+      "whyItMatters": "Purchase, advertising, tracking, analytics, social-auth, and AI/data-processing SDKs are categories App Review and privacy processes look at closely.",
+      "suggestedAction": "Confirm the SDK is required, and update App Privacy / review materials if the data surface changes.",
+      "officialSource": {
+        "title": "App Store Review Guidelines (privacy and payments sections)",
+        "url": "https://developer.apple.com/app-store/review/guidelines/"
+      },
+      "introducedByPR": true,
+      "fingerprint": "c50aced9e8f88862044ab241",
+      "semanticKey": "sdk:tracking:react-native-tracking-transparency",
+      "preExisting": false
+    }
+  ],
+  "preExistingCount": 0,
+  "hiddenBySuppressionCount": 0,
+  "ruleSummary": [
+    {
+      "ruleId": "ARD001",
+      "enabled": true,
+      "introduced": 0,
+      "preExisting": 0
+    },
+    {
+      "ruleId": "ARD002",
+      "enabled": true,
+      "introduced": 0,
+      "preExisting": 0
+    },
+    {
+      "ruleId": "ARD003",
+      "enabled": true,
+      "introduced": 1,
+      "preExisting": 0
+    },
+    {
+      "ruleId": "ARD004",
+      "enabled": true,
+      "introduced": 2,
+      "preExisting": 0
+    },
+    {
+      "ruleId": "ARD005",
+      "enabled": true,
+      "introduced": 1,
+      "preExisting": 0
+    },
+    {
+      "ruleId": "ARD006",
+      "enabled": true,
+      "introduced": 0,
+      "preExisting": 0
+    },
+    {
+      "ruleId": "ARD007",
+      "enabled": true,
+      "introduced": 2,
+      "preExisting": 0
+    },
+    {
+      "ruleId": "ARD008",
+      "enabled": true,
+      "introduced": 0,
+      "preExisting": 0
+    }
+  ],
+  "coverage": {
+    "base": {
+      "gaps": [],
+      "notes": []
+    },
+    "head": {
+      "gaps": [],
+      "notes": []
+    }
+  },
+  "durationMs": 11,
+  "config": {
+    "failOn": "error",
+    "ruleOverrides": {}
+  }
+}

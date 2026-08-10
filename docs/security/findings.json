@@ -1,0 +1,248 @@
+{
+  "documentType": "codex-security.findings",
+  "schemaVersion": "1.0",
+  "scanId": "scan_ard_20260810",
+  "findings": [
+    {
+      "findingId": "csf_f9981900ccc2c0f14b9c8250",
+      "occurrenceId": "occ_8b3f2ba53fb5f560002661f8",
+      "ruleId": "prototype-pollution.config-key-assignment",
+      "identity": {
+        "anchor": "config-key-assignment-without-null-prototype"
+      },
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:9d05dd01939461d8e45f11254b56af70523773f5af2bb377fff5cbe2de9e76b1"
+      },
+      "title": "Attacker-controlled dictionary keys can pollute Object.prototype",
+      "summary": "Dictionaries built from untrusted plist/config keys assigned values with plain-object semantics, so a key such as __proto__ could mutate Object.prototype and inject values the analyzer would read as configuration.",
+      "severity": {
+        "level": "medium",
+        "score": 5.5,
+        "scoringSystem": "CVSS:3.1",
+        "vector": "AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+        "rationale": "A malicious PR author controls plist and app.config keys; successful pollution alters analyzer-visible configuration and can corrupt downstream object behavior, but does not achieve code execution on the runner."
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "Reproduced with a minimal fixture: out['__proto__'] = {NSPrivacyTracking: 'INJECTED'} made out['NSPrivacyTracking'] resolve to the injected value."
+      },
+      "taxonomy": {
+        "category": "prototype-pollution",
+        "cwe": ["CWE-1321"]
+      },
+      "locations": [
+        {
+          "path": "src/parsers/plist.ts",
+          "startLine": 77,
+          "endLine": 80,
+          "role": "sink"
+        },
+        {
+          "path": "src/parsers/expoConfig.ts",
+          "startLine": 79,
+          "endLine": 81,
+          "role": "sink"
+        },
+        {
+          "path": "src/config/schema.ts",
+          "startLine": 48,
+          "endLine": 48,
+          "role": "sink"
+        }
+      ],
+      "remediation": "Build all attacker-keyed dictionaries with Object.create(null) (applied in src/parsers/plist.ts, src/parsers/expoConfig.ts walkPartial/evaluateNode/deepMerge, src/config/schema.ts parseRuleOverrides/parseSdkCategories, src/rules/sdkCategories.ts).",
+      "validation": {
+        "summary": "Confirmed vulnerable before fix with a standalone Node reproduction; confirmed fixed after change with a dedicated security test (test/security/malicious.test.ts '__proto__ keys do not pollute objects or inject values')."
+      },
+      "attackPath": {
+        "summary": "PR author commits PrivacyInfo.xcprivacy (or app.config.js) containing a __proto__ dictionary key; the plist/app-config parser assigns it to a plain object, mutating its prototype; subsequent field lookups (e.g., root['NSPrivacyTracking']) return attacker-supplied values, injecting analyzer conclusions.",
+        "reachability": "Reachable from the Action and CLI on any PR that includes such a file, because the file is inside the relevant-path set."
+      },
+      "rootCause": {
+        "summary": "Plain-object assignment of attacker-controlled keys without null prototypes.",
+        "code": "const out = {}; out[pendingKey] = convertNode(child);",
+        "language": "typescript"
+      },
+      "remediationTests": ["test/security/malicious.test.ts (prototype-pollution fixture)"],
+      "preventiveControls": [
+        "Null-prototype objects for all attacker-keyed dictionaries",
+        "Security fixture asserting Object.getPrototypeOf(result) === null"
+      ],
+      "provenance": {
+        "source": "parent-led_baseline_20260810"
+      },
+      "extensions": {}
+    },
+    {
+      "findingId": "csf_4c2fb9e7a65950d4eab47beb",
+      "occurrenceId": "occ_1e5206f65d4ad43bff4af17d",
+      "ruleId": "resource-exhaustion.oversized-blob-read",
+      "identity": {
+        "anchor": "oversized-content-read-before-size-check"
+      },
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:ca58a710b1e1cbeedc3d17636377c438974725ce74324d4508808e68091ca59b"
+      },
+      "title": "Oversized file content can be read into memory before the size limit is enforced",
+      "summary": "The local git provider and the GitHub blob fallback fetched full blob content before buildSnapshot applied max-file-size-bytes, so a multi-gigabyte file in a PR could transiently exhaust runner/CLI memory.",
+      "severity": {
+        "level": "low",
+        "score": 3.1,
+        "scoringSystem": "CVSS:3.1",
+        "vector": "AV:L/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L",
+        "rationale": "Local-CLI DoS potential only; the GitHub contents API inlines only small files, and the fallback path is bounded after the fix. Requires a large file in the relevant-path set."
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "Direct source trace: fetchBlob/getFile read content before any maxFileSize comparison."
+      },
+      "taxonomy": {
+        "category": "resource-exhaustion",
+        "cwe": ["CWE-400"]
+      },
+      "locations": [
+        {
+          "path": "src/git/gitSnapshot.ts",
+          "startLine": 91,
+          "endLine": 94,
+          "role": "sink"
+        },
+        {
+          "path": "src/github/client.ts",
+          "startLine": 188,
+          "endLine": 190,
+          "role": "sink"
+        }
+      ],
+      "remediation": "Check declared size (git cat-file -s / contents API size / stat) against max-file-size-bytes before reading content, and mark oversized files as truncated coverage gaps (applied).",
+      "validation": {
+        "summary": "Verified the size guard now short-circuits before the read in fetchBlob, fetchWorkingFile, and GitHub getFile; oversized-file coverage-gap behavior is covered by test/unit/buildSnapshot.test.ts."
+      },
+      "attackPath": {
+        "summary": "PR author adds a very large relevant file; the CLI or Action reads it fully into a Buffer before discarding it, transiently using size-bounded memory far above the configured limit.",
+        "reachability": "Reachable from the CLI and Action whenever the changed-file set includes a large relevant path."
+      },
+      "rootCause": {
+        "summary": "Content read preceded the size check in the provider layer.",
+        "language": "typescript"
+      },
+      "remediationTests": ["test/unit/buildSnapshot.test.ts (oversized-file gap)"],
+      "preventiveControls": [
+        "Size check before read in all three providers (git blob, working tree, GitHub contents/blob fallback)"
+      ],
+      "provenance": {
+        "source": "parent-led_baseline_20260810"
+      },
+      "extensions": {}
+    },
+    {
+      "findingId": "csf_1ad553a830e594678406eedc",
+      "occurrenceId": "occ_bfad8bdae138ff76062fdaaa",
+      "ruleId": "sensitive-data.unsanitized-finding-state",
+      "identity": {
+        "anchor": "finding-base-head-state-not-redacted"
+      },
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:69b3a8e2b51a04b3817e7aacafe211f09cbb21d03cba25cf29f5aca84d4a1f57"
+      },
+      "title": "Finding base/head state values were not passed through the redactor",
+      "summary": "candidateToFinding redacted evidence but copied baseState/headState verbatim, so a credential that appeared inside a compared configuration value (e.g., an exotic purpose string) could be echoed in JSON/markdown output.",
+      "severity": {
+        "level": "low",
+        "score": 2.6,
+        "scoringSystem": "CVSS:3.1",
+        "rationale": "ARD006 never populates state fields, and other rules' state values are configuration strings; the exposure requires a secret placed inside a compared config field, but defense-in-depth redaction is cheap."
+      },
+      "confidence": {
+        "level": "medium",
+        "rationale": "Code path confirmed; exploitability depends on rules populating state with secret-bearing content."
+      },
+      "taxonomy": {
+        "category": "sensitive-data-exposure",
+        "cwe": ["CWE-532"]
+      },
+      "locations": [
+        {
+          "path": "src/engine.ts",
+          "startLine": 39,
+          "endLine": 40,
+          "role": "sink"
+        }
+      ],
+      "remediation": "Route baseState/headState through redacted() before building Finding (applied).",
+      "validation": {
+        "summary": "Confirmed engine.ts now redacts both state fields; redaction unit tests still pass."
+      },
+      "attackPath": {
+        "summary": "A compared configuration value contains a private-credential-shaped string; the finding's state fields carry it into JSON/summary output unredacted.",
+        "reachability": "Reachable only when a rule populates state with the credential-bearing string."
+      },
+      "rootCause": {
+        "summary": "Inconsistent redaction coverage between evidence and state fields.",
+        "language": "typescript"
+      },
+      "remediationTests": ["test/unit/redact.test.ts"],
+      "preventiveControls": ["Single redaction path for every string field emitted by the engine"],
+      "provenance": {
+        "source": "parent-led_baseline_20260810"
+      },
+      "extensions": {}
+    },
+    {
+      "findingId": "csf_732a9ee6f7ab54a0023befa9",
+      "occurrenceId": "occ_7a3aa2f516801b4e51529814",
+      "ruleId": "input-validation.non-file-content-entry",
+      "identity": {
+        "anchor": "contents-api-non-file-entries-not-explicitly-skipped"
+      },
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:08abd64ce14ffc0a2a5d13b8c7c51ccc2ed93a53822c3b64adb485d9bd614a38"
+      },
+      "title": "Non-file contents-API entries were not explicitly skipped",
+      "summary": "The GitHub contents client only special-cased symlinks; directories and submodules fell through to the blob fallback path, which could raise or fetch unexpected data instead of a clean skip.",
+      "severity": {
+        "level": "low",
+        "score": 2.2,
+        "scoringSystem": "CVSS:3.1",
+        "rationale": "The relevant-path set rarely contains directories/submodules; impact is a noisy error or unnecessary request rather than a security break, and it is now explicitly skipped."
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "Direct source inspection of the contents response handling."
+      },
+      "taxonomy": {
+        "category": "input-validation",
+        "cwe": ["CWE-20"]
+      },
+      "locations": [
+        {
+          "path": "src/github/client.ts",
+          "startLine": 162,
+          "endLine": 170,
+          "role": "control"
+        }
+      ],
+      "remediation": "Skip any contents-API entry whose type is not 'file' and record it as a coverage gap (applied).",
+      "validation": {
+        "summary": "Code now returns a symlink-style skip for dir/submodule entries before the blob fallback."
+      },
+      "attackPath": {
+        "summary": "A PR path matching the relevant set resolves to a submodule/directory; the client would otherwise attempt a blob fetch of a non-blob object.",
+        "reachability": "Low; relevant-path patterns rarely match directories."
+      },
+      "rootCause": {
+        "summary": "Incomplete type handling for contents-API responses.",
+        "language": "typescript"
+      },
+      "preventiveControls": ["Explicit skip for all non-file contents entries"],
+      "provenance": {
+        "source": "parent-led_baseline_20260810"
+      },
+      "extensions": {}
+    }
+  ]
+}

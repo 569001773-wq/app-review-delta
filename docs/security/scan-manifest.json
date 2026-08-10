@@ -1,0 +1,40 @@
+{
+  "documentType": "codex-security.scan-manifest",
+  "schemaVersion": "1.0",
+  "scan": {
+    "id": "scan_ard_20260810",
+    "producer": {
+      "name": "codex-security-plugin",
+      "version": "0.1.18"
+    },
+    "status": "completed",
+    "startedAt": "2026-08-10T08:35:00Z",
+    "completedAt": "2026-08-10T09:10:00Z",
+    "sealedAt": "2026-08-10T09:10:00Z",
+    "target": {
+      "kind": "git_worktree",
+      "targetId": "target_ard_local_worktree",
+      "displayName": "app-review-delta (local pre-release worktree)",
+      "revision": "local-worktree",
+      "snapshotDigest": "codex-security-snapshot/v1:sha256:476ffd6405ae9fc013c5b3e3a67dcb80bfccffda10d7c59c684b6b2bc3de34dc"
+    },
+    "scope": {
+      "includePaths": ["."],
+      "excludePaths": ["node_modules/", "dist/", ".git/", "test/"]
+    },
+    "coverageRef": "coverage.json",
+    "findingsRef": "findings.json",
+    "artifacts": [
+      {
+        "path": "findings.json",
+        "sha256": "c3e9050c12657c153f18e08ce6d49c6481c733d578ef2e479c06f7e4c92defd1",
+        "mediaType": "application/json"
+      },
+      {
+        "path": "coverage.json",
+        "sha256": "cf38c61f3ec223b58ef56a7b5175c0ca5a7eaa3c72d38b420ab7cf6478e49ee3",
+        "mediaType": "application/json"
+      }
+    ]
+  }
+}
