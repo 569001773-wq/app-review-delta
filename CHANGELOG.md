@@ -4,6 +4,22 @@ All notable changes to AppReviewDelta are documented here. The format follows [K
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-10
+
+### Fixed
+
+- README no longer instructs users to `npm install -g app-review-delta` (the npm package is not published yet); the CLI is documented as running from source.
+- Removed unsupported general claims about competitors from the README and research notes; positioning now focuses on AppReviewDelta's own architecture.
+- Fixed a broken Apple documentation URL used by ARD004's official source.
+- Aligned ARD005 finding confidence (HIGH) with the documented metadata.
+- Fork pull requests are now analyzed correctly: head-side reads route to the fork repository, the changed-file list falls back to the PR files API when cross-repository compare is unavailable, and the check fails with a clear message when the workflow token cannot read a private fork.
+
+### Changed
+
+- GitHub Discussions enabled for support (README CTA verified).
+- `actions/checkout` and `actions/setup-node` bumped to v7 in CI/release workflows.
+- Re-ran the Codex Security repository scan on the final state: 0 reportable findings.
+
 ## [1.0.0] - 2026-08-10
 
 ### Added
