@@ -2,21 +2,21 @@
   "documentType": "codex-security.scan-manifest",
   "schemaVersion": "1.0",
   "scan": {
-    "id": "scan_ard_final_20260810",
+    "id": "scan_ard_v104_20260810",
     "producer": {
       "name": "codex-security-plugin",
       "version": "0.1.18"
     },
     "status": "completed",
-    "startedAt": "2026-08-10T03:10:00Z",
-    "completedAt": "2026-08-10T03:35:00Z",
-    "sealedAt": "2026-08-10T03:35:00Z",
+    "startedAt": "2026-08-10T03:50:00Z",
+    "completedAt": "2026-08-10T04:15:00Z",
+    "sealedAt": "2026-08-10T04:15:00Z",
     "target": {
       "kind": "git_worktree",
-      "targetId": "target_ard_local_worktree_final",
-      "displayName": "app-review-delta (post-v1.0.2 worktree)",
+      "targetId": "target_ard_local_worktree_v104",
+      "displayName": "app-review-delta (v1.0.4 worktree)",
       "revision": "local-worktree",
-      "snapshotDigest": "codex-security-snapshot/v1:sha256:36e9ebd206ce9dfc8d124a8a5c77274585319a476a95990e8f749f3a6164d07f"
+      "snapshotDigest": "codex-security-snapshot/v1:sha256:cffaedbe67bb386e27983c9ba206e127281b14c29f7336284221ceaf6cb5a2a3"
     },
     "scope": {
       "includePaths": ["."],
@@ -27,12 +27,12 @@
     "artifacts": [
       {
         "path": "findings.json",
-        "sha256": "de59123eb81ad820ed81af4df3668cc0d57e165e456a448896a0af9023c9e841",
+        "sha256": "293609f15b55588d28fce160454fc58719ffc5bc422edbab91f8d40079bc5109",
         "mediaType": "application/json"
       },
       {
         "path": "coverage.json",
-        "sha256": "0f8b3fe3103b02aa0529058d1dd46edabea07a61d058b849074675cbfe83b4d7",
+        "sha256": "d24227a78ba3efce2508f731db5df843778ea3dde1c19cf7a1506b7da64bbf29",
         "mediaType": "application/json"
       }
     ]

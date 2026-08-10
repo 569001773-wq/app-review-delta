@@ -1,7 +1,7 @@
 {
   "documentType": "codex-security.coverage",
   "schemaVersion": "1.0",
-  "scanId": "scan_ard_final_20260810",
+  "scanId": "scan_ard_v104_20260810",
   "mode": "repository",
   "completeness": "complete",
   "inventoryStrategy": "directory",
@@ -13,28 +13,28 @@
       "label": "Untrusted-content parsers (plist, JSON, YAML, static Expo config)",
       "disposition": "no_issue_found",
       "receiptRefs": [],
-      "notes": "Null-prototype hardening and __proto__ fixture verified."
+      "notes": "Null-prototype hardening and defineConfig whitelist verified; arbitrary wrappers are unresolvable."
     },
     {
       "id": "surface_action_runtime",
-      "label": "GitHub Action entry, runner shim, context reader, REST client, snapshot builder, engine, reporters",
+      "label": "GitHub Action entry, policy resolution, runner shim, REST client, snapshot builder, engine, reporters",
       "disposition": "no_issue_found",
       "receiptRefs": [],
-      "notes": "Includes the self-contained runner shim (src/action/runner.ts), BOM-tolerant context reader, @octokit/rest client, and fork-PR routing with PR-files fallback. Review found no new issues."
+      "notes": "Includes base-first policy resolution (config.ts), PR-files pagination, fork routing, self-contained runner shim, and BOM-tolerant context reader. Review found no new issues."
     },
     {
       "id": "surface_local_git_layer",
       "label": "Local git snapshot layer and working-tree reads",
       "disposition": "no_issue_found",
       "receiptRefs": [],
-      "notes": "Size-before-read guards verified in all three providers."
+      "notes": "lstat + realpath containment closes symlink/junction escape; size-before-read guards verified."
     },
     {
       "id": "surface_rules_and_config",
       "label": "Rules, secret patterns, config schema, redaction",
       "disposition": "no_issue_found",
       "receiptRefs": [],
-      "notes": "Redaction covers evidence and base/head state fields; ARD005 confidence aligned."
+      "notes": "RevenueCat public keys no longer flagged; ARD009 policy-change detection added; redaction covers evidence and state fields."
     }
   ],
   "explicitExclusions": [
