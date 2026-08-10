@@ -10,6 +10,8 @@ import {
 import {
   PRIVACY_ACCESSED_CATEGORIES,
   PRIVACY_ACCESSED_LAST_VERIFIED,
+  COLLECTED_DATA_PURPOSES,
+  COLLECTED_DATA_PURPOSES_LAST_VERIFIED,
   PRIVACY_MANIFEST_TOP_LEVEL_KEYS,
   REASON_CODE_FORMAT,
 } from './privacyManifestData';
@@ -435,39 +437,109 @@ function validateManifest(
           'NSPrivacyCollectedDataTypeTracking',
         ]) {
           const bv = entry[boolKey];
-          if (bv !== undefined && typeof bv !== 'boolean') {
+          if (bv === undefined) {
             out.push(
               finding(
                 ctx,
                 file,
-                'WARNING',
-                'MEDIUM',
+                'ERROR',
+                'HIGH',
+                'manifest:collected-missing-bool',
+                `entry:${i}:${boolKey}`,
+                `${boolKey} is missing`,
+                `Apple documents ${boolKey} as a required Boolean in each collected-data entry.`,
+                'A collected-data entry without the linked/tracking Booleans is structurally incomplete.',
+                `Add ${boolKey} (true or false).`,
+              ),
+            );
+          } else if (typeof bv !== 'boolean') {
+            out.push(
+              finding(
+                ctx,
+                file,
+                'ERROR',
+                'HIGH',
                 'manifest:collected-bool-not-boolean',
                 `entry:${i}:${boolKey}`,
                 `${boolKey} is not a boolean`,
                 `Apple documents ${boolKey} as a Boolean.`,
-                'A non-boolean value is structurally inconsistent.',
+                'A non-boolean value is structurally invalid.',
                 'Set the value to true or false.',
               ),
             );
           }
         }
         const purposes = entry['NSPrivacyCollectedDataTypePurposes'];
-        if (purposes !== undefined && !isArray(purposes)) {
+        if (purposes === undefined) {
           out.push(
             finding(
               ctx,
               file,
-              'WARNING',
-              'MEDIUM',
+              'ERROR',
+              'HIGH',
+              'manifest:collected-missing-purposes',
+              `entry:${i}`,
+              'NSPrivacyCollectedDataTypePurposes is missing',
+              'Apple documents collection purposes as a required array of strings in each collected-data entry.',
+              'A collected-data entry without purposes is structurally incomplete.',
+              'Add the purposes array with documented purpose values.',
+            ),
+          );
+        } else if (!isArray(purposes)) {
+          out.push(
+            finding(
+              ctx,
+              file,
+              'ERROR',
+              'HIGH',
               'manifest:purposes-not-array',
               `entry:${i}`,
               'NSPrivacyCollectedDataTypePurposes is not an array',
               'Apple documents purposes as an array of strings.',
-              'A non-array value is structurally inconsistent.',
+              'A non-array value is structurally invalid.',
               'Provide the purposes as an array of strings.',
             ),
           );
+        } else {
+          purposes.forEach((p, pi) => {
+            if (typeof p !== 'string') {
+              out.push(
+                finding(
+                  ctx,
+                  file,
+                  'ERROR',
+                  'HIGH',
+                  'manifest:collected-purpose-not-string',
+                  `entry:${i}:purpose:${pi}`,
+                  'Collection-purpose entry is not a string',
+                  `NSPrivacyCollectedDataTypePurposes[${pi}] is ${typeof p}; entries must be strings.`,
+                  'Apple documents purposes as an array of strings.',
+                  'Use documented purpose values.',
+                ),
+              );
+              return;
+            }
+            if (!(COLLECTED_DATA_PURPOSES as readonly string[]).includes(p)) {
+              const strict = ctx.config.reasonCodeMode === 'strict';
+              out.push(
+                finding(
+                  ctx,
+                  file,
+                  strict ? 'ERROR' : 'WARNING',
+                  'HIGH',
+                  'manifest:collected-purpose-not-documented',
+                  `entry:${i}:purpose:${p}`,
+                  'Collection purpose is not in the documented set',
+                  `"${p}" is not among the purposes documented by Apple on ${COLLECTED_DATA_PURPOSES_LAST_VERIFIED}.`,
+                  'Apple states that custom purposes break privacy-report generation.',
+                  'Use one of the documented purpose values.',
+                  [
+                    'Apple may add purposes over time; this check reflects the documentation version above.',
+                  ],
+                ),
+              );
+            }
+          });
         }
       });
     }

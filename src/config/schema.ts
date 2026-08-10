@@ -132,6 +132,7 @@ export function defaultConfig(): AppReviewConfig {
     maxFileSizeBytes: 2 * 1024 * 1024,
     maxFiles: 300,
     maxComparePages: 2,
+    maxPrFilesPages: 30,
   };
 }
 
@@ -151,6 +152,17 @@ export function parseConfig(raw: unknown): AppReviewConfig {
   cfg.maxFileSizeBytes =
     rawMax === undefined ? base.maxFileSizeBytes : asNumber(rawMax, 'max-file-size-bytes');
   if (cfg.maxFileSizeBytes <= 0) throw new ConfigError('max-file-size-bytes must be positive');
+
+  const rawPrPages = raw['max-pr-files-pages'] ?? raw.maxPrFilesPages;
+  cfg.maxPrFilesPages =
+    rawPrPages === undefined ? base.maxPrFilesPages : asNumber(rawPrPages, 'max-pr-files-pages');
+  if (
+    !Number.isInteger(cfg.maxPrFilesPages) ||
+    cfg.maxPrFilesPages < 1 ||
+    cfg.maxPrFilesPages > 30
+  ) {
+    throw new ConfigError('max-pr-files-pages must be an integer between 1 and 30');
+  }
 
   const pm = raw['privacy-manifest'] ?? raw.privacyManifest;
   if (pm !== undefined) {

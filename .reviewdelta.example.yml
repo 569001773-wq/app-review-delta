@@ -24,6 +24,8 @@ rules:
     enabled: true
   ARD008:
     enabled: true
+  ARD009:
+    enabled: true
 
 # Paths excluded from analysis (glob, relative to the repository root).
 exclude-paths:
@@ -48,3 +50,8 @@ privacy-manifest:
 
 # Safety limits.
 max-file-size-bytes: 2097152
+
+# Pagination cap for the PR files API (per_page=100). 30 pages = 3000 files,
+# GitHub's documented maximum for a comparison. Higher limits cost more API
+# requests; exceeding the cap is reported as a coverage gap.
+max-pr-files-pages: 30

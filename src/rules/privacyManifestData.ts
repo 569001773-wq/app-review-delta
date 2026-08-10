@@ -23,3 +23,21 @@ export const PRIVACY_MANIFEST_TOP_LEVEL_KEYS = [
 ] as const;
 
 export const REASON_CODE_FORMAT = /^[A-Z0-9]{2,6}\.[0-9]{1,2}$/;
+
+/**
+ * Documented NSPrivacyCollectedDataTypePurposes values, checked against
+ * Apple's "Describing data use in privacy manifests" documentation on
+ * 2026-08-10. Apple states that custom reasons break privacy-report
+ * generation, so membership is validated (lenient mode warns on unknown
+ * values because the list may change).
+ */
+export const COLLECTED_DATA_PURPOSES = [
+  'NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising',
+  'NSPrivacyCollectedDataTypePurposeDeveloperAdvertising',
+  'NSPrivacyCollectedDataTypePurposeAnalytics',
+  'NSPrivacyCollectedDataTypePurposeProductPersonalization',
+  'NSPrivacyCollectedDataTypePurposeAppFunctionality',
+  'NSPrivacyCollectedDataTypePurposeOther',
+] as const;
+
+export const COLLECTED_DATA_PURPOSES_LAST_VERIFIED = '2026-08-10';

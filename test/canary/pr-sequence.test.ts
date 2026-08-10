@@ -38,7 +38,12 @@ async function runDelta(repo: string, base: string, head: string) {
   return analyze(baseSnap, headSnap, config, { version: 'canary' });
 }
 
-describe('realistic canary: PR sequence on a synthetic repository', () => {
+describe('local differential-engine canary (synthetic git repository)', () => {
+  // NOTE: this canary exercises the local engine (git snapshots + analyze).
+  // External validation of the published Action — GitHubClient, real Compare/
+  // PR-files APIs, events, permissions, job summary, annotations, fail
+  // behavior — is performed separately against a synthetic consumer
+  // repository using the published @v1 tag (documented in the release notes).
   it('reproduces the expected finding lifecycle across PRs A-E and their fixes', async () => {
     const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'ard-canary-'));
     try {

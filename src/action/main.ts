@@ -1,11 +1,11 @@
 import { VERSION } from '../version';
-import { AppReviewConfig, configFromText, defaultConfig } from '../config/load';
 import { analyze } from '../engine';
 import { GitHubClient } from '../github/client';
 import { buildGitHubSnapshots } from '../github/githubSnapshot';
 import { resolvePullRequestRepos } from '../github/repoResolver';
 import { getGitHubContext } from '../github/context';
 import * as core from './runner';
+import { isConfigRef, resolveActionConfig } from './config';
 import { formatJson } from '../reporting/json';
 import { formatMarkdown } from '../reporting/markdown';
 import { formatTerminal, failsOn, findingCounts } from '../reporting/terminal';
@@ -28,45 +28,19 @@ function getPullRequestShas(payload: { pull_request?: unknown }): {
   return { baseSha, headSha };
 }
 
-async function loadConfigFromRepo(
-  client: GitHubClient,
-  headSha: string,
-  configPath: string,
-  inputFailOn: string | undefined,
-  inputMaxFileSize: number | undefined,
-): Promise<AppReviewConfig> {
-  const cfg = defaultConfig();
-  const f = await client.getFile(configPath, headSha);
-  if (
-    !f.missing &&
-    !f.truncated &&
-    f.content.length > 0 &&
-    f.content.length <= cfg.maxFileSizeBytes
-  ) {
-    const text = new TextDecoder('utf-8', { fatal: false }).decode(f.content);
-    const parsed = configFromText(text, configPath);
-    return {
-      ...parsed,
-      failOn: inputFailOn ? (inputFailOn as AppReviewConfig['failOn']) : parsed.failOn,
-      maxFileSizeBytes: inputMaxFileSize ?? parsed.maxFileSizeBytes,
-    };
-  }
-  return {
-    ...cfg,
-    failOn: inputFailOn ? (inputFailOn as AppReviewConfig['failOn']) : cfg.failOn,
-    maxFileSizeBytes: inputMaxFileSize ?? cfg.maxFileSizeBytes,
-  };
-}
-
 async function main(): Promise<void> {
   const token = core.getInput('token');
   const failOnInput = core.getInput('fail-on') || undefined;
   const configPath = core.getInput('config-path') || '.reviewdelta.yml';
+  const configRefInput = core.getInput('config-ref') || 'base';
   const maxFileSizeInput = Number(core.getInput('max-file-size-bytes') || '0');
   const jsonOutputPath = core.getInput('output-json');
 
   if (failOnInput && !['error', 'warning', 'never'].includes(failOnInput)) {
     throw new Error('fail-on must be one of: error, warning, never');
+  }
+  if (!isConfigRef(configRefInput)) {
+    throw new Error('config-ref must be one of: base, head');
   }
 
   const context = getGitHubContext();
@@ -78,13 +52,17 @@ async function main(): Promise<void> {
   const baseClient = new GitHubClient(baseRepo.owner, baseRepo.repo, token || undefined);
   const headClient = new GitHubClient(headRepo.owner, headRepo.repo, token || undefined);
 
-  const config = await loadConfigFromRepo(
+  const { config } = await resolveActionConfig({
+    baseClient,
     headClient,
+    baseSha,
     headSha,
     configPath,
-    failOnInput,
-    Number.isFinite(maxFileSizeInput) && maxFileSizeInput > 0 ? maxFileSizeInput : undefined,
-  );
+    configRef: configRefInput,
+    inputFailOn: failOnInput,
+    inputMaxFileSize:
+      Number.isFinite(maxFileSizeInput) && maxFileSizeInput > 0 ? maxFileSizeInput : undefined,
+  });
 
   const { base, head } = await buildGitHubSnapshots({
     baseClient,

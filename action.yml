@@ -22,6 +22,14 @@ inputs:
       If not found, defaults are used.
     required: false
     default: '.reviewdelta.yml'
+  config-ref:
+    description: >-
+      Which revision supplies the scanner policy (.reviewdelta.yml): base
+      (default) or head. base is recommended: a PR must not be able to change
+      the policy that gates its own check. Changes made in the PR are reported
+      (ARD009) and take effect only after merge.
+    required: false
+    default: base
   max-file-size-bytes:
     description: >-
       Maximum file size (bytes) to fetch and analyze. Larger files are skipped

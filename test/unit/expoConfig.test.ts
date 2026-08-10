@@ -22,6 +22,23 @@ describe('static Expo config extraction', () => {
     expect(r.object?.name).toBe('A');
   });
 
+  it('does NOT unwrap arbitrary wrapper functions', () => {
+    const r = staticAppConfigJs(
+      `export default someWrapper({ name: 'A', ios: { bundleIdentifier: 'com.a' } });`,
+      'app.config.ts',
+    );
+    expect(r.resolved).toBe(false);
+  });
+
+  it('does NOT unwrap defineConfig unless it is imported from expo', () => {
+    const r = staticAppConfigJs(
+      `import { defineConfig } from 'some-other-lib';
+       export default defineConfig({ name: 'A', slug: 'a' });`,
+      'app.config.ts',
+    );
+    expect(r.resolved).toBe(false);
+  });
+
   it('resolves module.exports', () => {
     const r = staticAppConfigJs(`module.exports = { name: 'B', slug: 'b' };`, 'app.config.js');
     expect(r.resolved).toBe(true);

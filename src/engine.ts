@@ -9,7 +9,7 @@ import {
 } from './types';
 import { AppReviewConfig, isIgnoreActive } from './config/load';
 import { RULES, ruleById } from './rules/registry';
-import { getExpoConfig } from './rules/shared';
+import { effectiveSeverity, getExpoConfig } from './rules/shared';
 import { fingerprintOf } from './util/hash';
 import { redacted } from './util/redact';
 import picomatch from 'picomatch';
@@ -96,7 +96,11 @@ function coverageKey(g: CoverageGap): string {
   return `${g.kind}:${g.scope}`;
 }
 
-function buildCoverageFindings(base: Snapshot | null, head: Snapshot): CandidateFinding[] {
+function buildCoverageFindings(
+  base: Snapshot | null,
+  head: Snapshot,
+  config: AppReviewConfig,
+): CandidateFinding[] {
   const headGaps = [...head.coverage.gaps, ...expoCoverageGaps(head)];
   const baseGaps = base ? [...base.coverage.gaps, ...expoCoverageGaps(base)] : [];
   const baseKeys = new Set(baseGaps.map(coverageKey));
@@ -107,7 +111,7 @@ function buildCoverageFindings(base: Snapshot | null, head: Snapshot): Candidate
     out.push({
       ruleId: 'ARD008',
       title: 'Static analysis coverage gap',
-      severity: 'INFO',
+      severity: effectiveSeverity('INFO', config, 'ARD008'),
       confidence: 'HIGH',
       category: 'coverage',
       file: scopeLabel,
@@ -173,7 +177,7 @@ export function analyze(
 
   const headRaw = runCandidates(head, base);
   const baseRaw = base ? runCandidates(base, null) : [];
-  const coverageFindings = buildCoverageFindings(base, head);
+  const coverageFindings = buildCoverageFindings(base, head, config);
   const allHeadCandidates = [...headRaw, ...coverageFindings];
 
   let hiddenBySuppressionCount = 0;

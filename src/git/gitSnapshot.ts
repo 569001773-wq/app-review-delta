@@ -3,6 +3,7 @@ import { promisify } from 'node:util';
 import { AppReviewConfig } from '../config/load';
 import { buildSnapshot, FileProvider, ChangedPathsProvider } from '../snapshots/buildSnapshot';
 import { Snapshot } from '../types';
+import { decodeUtf8 } from '../util/paths';
 
 const execFileAsync = promisify(execFile);
 
@@ -185,7 +186,23 @@ export async function buildGitWorkingSnapshot(
   return { base, head };
 }
 
-async function fetchWorkingFile(
+/**
+ * Reads a single file's content at a git ref without checking it out.
+ * Returns { text: null } when the file is missing, a symlink, or oversized.
+ */
+export async function readGitFileAtRef(
+  repoDir: string,
+  ref: string,
+  path: string,
+  maxFileSize = 2 * 1024 * 1024,
+): Promise<{ text: string | null }> {
+  const resolved = await resolveGitRef(repoDir, ref);
+  const blob = await fetchBlob(repoDir, resolved, path, maxFileSize);
+  if (blob.missing || blob.symlink || blob.truncated) return { text: null };
+  return { text: decodeUtf8(blob.content) };
+}
+
+export async function fetchWorkingFile(
   repoDir: string,
   path: string,
   maxFileSize: number,
@@ -197,14 +214,55 @@ async function fetchWorkingFile(
   truncated: boolean;
 }> {
   const { resolve, relative, sep } = await import('node:path');
-  const { stat, readFile } = await import('node:fs/promises');
+  const { lstat, readFile, realpath } = await import('node:fs/promises');
   const abs = resolve(repoDir, ...path.split('/'));
   const rel = relative(repoDir, abs);
   if (rel.startsWith('..') || rel.split(sep).includes('..')) {
     return { missing: true, symlink: true, content: new Uint8Array(), size: 0, truncated: false };
   }
   try {
-    const st = await stat(abs);
+    // Resolve the real path and verify it stays inside the repository.
+    // realpath follows symlinks, so this catches links that escape the repo
+    // even when lstat on the final component would not.
+    const realRepo = await realpath(repoDir);
+    let realAbs: string;
+    try {
+      realAbs = await realpath(abs);
+    } catch {
+      // Broken symlink or missing file.
+      try {
+        const broken = await lstat(abs);
+        if (broken.isSymbolicLink()) {
+          return {
+            missing: false,
+            symlink: true,
+            content: new Uint8Array(),
+            size: 0,
+            truncated: false,
+          };
+        }
+      } catch {
+        // fall through to missing
+      }
+      return {
+        missing: true,
+        symlink: false,
+        content: new Uint8Array(),
+        size: 0,
+        truncated: false,
+      };
+    }
+    const realRel = relative(realRepo, realAbs);
+    if (realRel.startsWith('..') || realRel.split(sep).includes('..')) {
+      return {
+        missing: false,
+        symlink: true,
+        content: new Uint8Array(),
+        size: 0,
+        truncated: false,
+      };
+    }
+    const st = await lstat(abs);
     if (st.isSymbolicLink()) {
       return {
         missing: false,

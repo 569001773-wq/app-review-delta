@@ -120,12 +120,42 @@ function evaluateNode(node: BabelNode | undefined | null): ResolvedValue {
   }
 }
 
+/**
+ * Whitelisted config wrappers whose semantics are provably identity for a
+ * literal object argument. Expo's defineConfig returns its argument unchanged;
+ * anything else could transform the config at runtime and is treated as
+ * unresolvable.
+ */
+function isKnownIdentityWrapper(ast: BabelNode, callee: BabelNode): boolean {
+  if (callee.type !== 'Identifier' || callee.name !== 'defineConfig') return false;
+  const body = (ast.program as { body?: BabelNode[] } | undefined)?.body ?? [];
+  for (const stmt of body) {
+    if (stmt.type === 'ImportDeclaration') {
+      const source = nodeText(stmt.source);
+      if (!source.startsWith('expo/')) continue;
+      const specifiers = stmt.specifiers as BabelNode[] | undefined;
+      if (!specifiers) continue;
+      for (const spec of specifiers) {
+        if (spec.type === 'ImportSpecifier' && nodeText(spec.imported) === 'defineConfig') {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 function getExportExpression(ast: BabelNode): BabelNode | null {
   const body = (ast.program as { body?: BabelNode[] } | undefined)?.body ?? [];
   for (const stmt of body) {
     if (stmt.type === 'ExportDefaultDeclaration') {
       const decl = stmt.declaration as BabelNode;
       if (decl.type === 'CallExpression') {
+        const callee = decl.callee as BabelNode;
+        // Only unwrap calls to a proven identity wrapper (defineConfig from
+        // expo/config). Arbitrary wrappers may transform the config at
+        // runtime; the result must be treated as unresolvable.
+        if (!isKnownIdentityWrapper(ast, callee)) return decl;
         const args = decl.arguments as BabelNode[];
         const first = args[0];
         if (first && first.type === 'ObjectExpression') return first;

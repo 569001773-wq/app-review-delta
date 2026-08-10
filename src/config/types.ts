@@ -28,6 +28,8 @@ export interface AppReviewConfig {
   maxFileSizeBytes: number;
   maxFiles: number;
   maxComparePages: number;
+  /** PR files API pagination cap (per_page=100, max 3000 files). */
+  maxPrFilesPages: number;
   sdkCategories?: SdkCategoryConfig;
 }
 
@@ -40,6 +42,7 @@ export const KNOWN_RULES = [
   'ARD006',
   'ARD007',
   'ARD008',
+  'ARD009',
 ] as const;
 
 export const SEVERITIES: Severity[] = ['ERROR', 'WARNING', 'INFO'];

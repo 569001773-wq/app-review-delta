@@ -3,6 +3,7 @@ import {
   CandidateFindingInput,
   Rule,
   RuleContext,
+  effectiveSeverity,
   isDictValue,
   listPrivacyManifestSources,
   normalizeList,
@@ -103,6 +104,27 @@ export const ARD002: Rule = {
     const headSources = listPrivacyManifestSources(ctx.head);
     const baseSources = listPrivacyManifestSources(ctx.base);
     const baseByFile = new Map(baseSources.map((s) => [s.file, s]));
+    const headByFile = new Map(headSources.map((s) => [s.file, s]));
+
+    // A manifest present in BASE but removed entirely in HEAD must not fall
+    // through the cracks: report it as a regression.
+    for (const baseSrc of baseSources) {
+      if (headByFile.has(baseSrc.file)) continue;
+      out.push(
+        finding(
+          baseSrc.file,
+          'WARNING',
+          'HIGH',
+          'regression:manifest-removed',
+          `file:${baseSrc.file}`,
+          'Privacy manifest removed',
+          `BASE contained ${baseSrc.file}; HEAD removes it entirely.`,
+          'Removing a privacy manifest changes the App Privacy surface and may hide required declarations.',
+          'Restore the manifest, or confirm the move was intentional and the target location is analyzed.',
+        ),
+      );
+    }
+
     for (const headSrc of headSources) {
       const baseSrc = baseByFile.get(headSrc.file);
       if (!baseSrc) continue; // manifest added by the PR -> ARD001 domain.
@@ -181,6 +203,10 @@ export const ARD002: Rule = {
           );
         }
       }
+    }
+    // Every rule honors per-rule severity overrides (ARD002 included).
+    for (const c of out) {
+      c.severity = effectiveSeverity(c.severity, ctx.config, 'ARD002');
     }
     void PRIVACY_ACCESSED_LAST_VERIFIED;
     return out;

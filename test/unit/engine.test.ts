@@ -102,4 +102,57 @@ describe('baseline differential engine', () => {
     const result = analyzeFixture(base, head, cfg);
     expect(result.findings.find((f) => f.ruleId === 'ARD003')?.severity).toBe('INFO');
   });
+
+  it('applies severity overrides to every rule (ARD002/ARD006/ARD007/ARD008)', () => {
+    const cfg = defaultConfig();
+    cfg.rules.ARD002 = { severity: 'INFO' };
+    cfg.rules.ARD006 = { severity: 'INFO' };
+    cfg.rules.ARD007 = { severity: 'WARNING' };
+    cfg.rules.ARD008 = { severity: 'WARNING' };
+
+    const base = cleanExpoApp();
+    const head = {
+      ...base,
+      'package.json': JSON.stringify({
+        name: 'x',
+        scripts: {},
+        dependencies: { expo: '~55.0.0', 'react-native-purchases': '^8.0.0' },
+      }),
+      'ios/Example/PrivacyInfo.xcprivacy': `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+  <key>NSPrivacyTracking</key><true/>
+</dict></plist>`,
+      'ios/keys/AuthKey_TEST.p8':
+        '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASC\n-----END PRIVATE KEY-----\n',
+      'app.config.ts': `import fs from 'fs';
+export default { expo: { ios: { infoPlist: { NSMicrophoneUsageDescription: fs.readFileSync('x', 'utf8') } } } };`,
+    };
+    const result = analyzeFixture(base, head, cfg);
+    expect(result.findings.find((f) => f.ruleId === 'ARD002')).toBeUndefined();
+    expect(result.findings.find((f) => f.ruleId === 'ARD006')?.severity).toBe('INFO');
+    expect(result.findings.find((f) => f.ruleId === 'ARD007')?.severity).toBe('WARNING');
+    expect(result.findings.find((f) => f.ruleId === 'ARD008')?.severity).toBe('WARNING');
+  });
+
+  it('reports scanner-policy changes as ARD009 INFO and still uses BASE policy', () => {
+    const base = cleanExpoApp();
+    base['.reviewdelta.yml'] = 'fail-on: warning\n';
+    const head = { ...base };
+    head['.reviewdelta.yml'] = 'fail-on: never\nrules:\n  ARD001:\n    enabled: false\n';
+    // The engine receives the BASE policy (the Action resolves it that way);
+    // the ARD009 finding is informational.
+    const cfg = defaultConfig();
+    const result = analyzeFixture(base, head, cfg);
+    const ard009 = result.findings.filter((f) => f.ruleId === 'ARD009');
+    expect(ard009).toHaveLength(1);
+    expect(ard009[0]?.severity).toBe('INFO');
+    expect(ard009[0]?.evidence).toContain('BASE policy');
+  });
+
+  it('does not report ARD009 when the policy is unchanged', () => {
+    const base = cleanExpoApp();
+    base['.reviewdelta.yml'] = 'fail-on: warning\n';
+    const result = analyzeFixture(base, { ...base });
+    expect(result.findings.filter((f) => f.ruleId === 'ARD009')).toHaveLength(0);
+  });
 });

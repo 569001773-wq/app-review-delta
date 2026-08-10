@@ -16,6 +16,8 @@ const RELEVANT_PATH_PATTERNS: RegExp[] = [
   /^app\.config\.js$/,
   /^app\.config\.ts$/,
   /^eas\.json$/,
+  /^\.reviewdelta\.yml$/,
+  /^\.reviewdelta\.yaml$/,
   // iOS native configuration.
   /\.xcprivacy$/,
   /(^|\/)Info\.plist$/,
@@ -45,4 +47,6 @@ export const ALWAYS_RELEVANT = [
   'app.config.json',
   'app.config.js',
   'app.config.ts',
+  '.reviewdelta.yml',
+  '.reviewdelta.yaml',
 ] as const;

@@ -1,6 +1,6 @@
 ﻿{
   "tool": "AppReviewDelta",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "baseRef": "bb8550aa3c2c2480e997d26c507b177173690128",
   "headRef": "6aa82a65d0e241fda033bac1a8bfa99b2c08eee3",
   "findings": [
@@ -177,6 +177,12 @@
       "enabled": true,
       "introduced": 0,
       "preExisting": 0
+    },
+    {
+      "ruleId": "ARD009",
+      "enabled": true,
+      "introduced": 0,
+      "preExisting": 0
     }
   ],
   "coverage": {
@@ -189,7 +195,7 @@
       "notes": []
     }
   },
-  "durationMs": 19,
+  "durationMs": 12,
   "config": {
     "failOn": "error",
     "ruleOverrides": {}

@@ -85,11 +85,14 @@ These **do** create new findings:
 | ARD006 | Strong Client Secret Exposure              | ERROR                                       | HIGH       |
 | ARD007 | Review-Sensitive SDK Category Added        | INFO                                        | HIGH       |
 | ARD008 | Static Analysis Coverage Gap               | INFO                                        | HIGH       |
+| ARD009 | Scanner Policy Changed in PR               | INFO                                        | HIGH       |
 
 Every rule is documented in [docs/RULES.md](docs/RULES.md) with its official Apple/Expo source, last-verified date, detection logic, and false-positive considerations.
 
 ¹ ARD003: HIGH confidence for `NSAllowsArbitraryLoads`; MEDIUM/LOW for narrower exceptions (`NSAllowsArbitraryLoadsForMedia`, per-domain insecure loads, local networking).
 ² ARD004: WARNING for empty/placeholder purpose strings; INFO for surface introduction and rewording; generic-wording heuristics are INFO LOW.
+
+Every rule honors per-rule `severity` overrides from the configuration.
 
 ## Security model
 
@@ -127,6 +130,8 @@ jobs:
 ```
 
 No checkout step is needed. The Action writes a job summary, emits GitHub annotations, and fails the check when findings at the configured threshold are introduced (default: `ERROR` fails, `WARNING` and `INFO` do not).
+
+**Scanner policy comes from the base branch.** By default the Action reads `.reviewdelta.yml` from the PR base revision, so a PR cannot change the rules, suppressions, severities, or fail threshold that gate its own check. A policy change made in the PR is reported as an INFO finding (ARD009) and takes effect only after merge. If you explicitly want the PR's own policy to apply, set `config-ref: head` — this is documented as untrusted.
 
 ### Local CLI
 
@@ -167,9 +172,10 @@ ignore:
     expires: '2026-12-01' # optional; expired suppressions reappear
 privacy-manifest:
   reason-code-mode: lenient # lenient (default) | strict
+max-pr-files-pages: 30 # PR files API pagination cap (per_page=100)
 ```
 
-Suppressions require a reason. See [.reviewdelta.example.yml](.reviewdelta.example.yml) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Suppressions require a reason. Severity overrides apply to every rule. See [.reviewdelta.example.yml](.reviewdelta.example.yml) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Example output
 

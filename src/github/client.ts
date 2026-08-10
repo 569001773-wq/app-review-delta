@@ -80,10 +80,13 @@ export class GitHubClient {
     private readonly owner: string,
     private readonly repo: string,
     token: string | undefined,
+    rest?: OctokitRest,
   ) {
-    this.octokit = new Octokit({
-      auth: token && token.length > 0 ? token : undefined,
-    }) as unknown as { rest: OctokitRest };
+    this.octokit = rest
+      ? { rest }
+      : (new Octokit({
+          auth: token && token.length > 0 ? token : undefined,
+        }) as unknown as { rest: OctokitRest });
   }
 
   private async request<T>(fn: () => Promise<T>): Promise<T> {
@@ -105,42 +108,41 @@ export class GitHubClient {
     throw lastError;
   }
 
-  async compareCommits(baseSha: string, headSha: string, maxPages: number): Promise<CompareResult> {
+  /**
+   * Compares two commits. GitHub's compare endpoint returns changed files only
+   * on the first page and caps the comparison at 300 files; a full first page
+   * is therefore reported as truncated instead of silently continuing.
+   */
+  async compareCommits(baseSha: string, headSha: string): Promise<CompareResult> {
     const files: ChangedFileInfo[] = [];
     const notes: string[] = [];
-    let truncated = false;
-    let sawFullPage = false;
-    for (let page = 1; page <= maxPages; page++) {
-      const data = await this.request(() =>
-        this.octokit.rest.repos
-          .compareCommits({
-            owner: this.owner,
-            repo: this.repo,
-            base: baseSha,
-            head: headSha,
-            per_page: 300,
-            page,
-          })
-          .then((r) => r.data),
-      );
-      const pageFiles = data.files ?? [];
-      for (const f of pageFiles) {
-        if (!f.filename) continue;
-        files.push({
-          path: f.filename,
-          status: f.status ?? 'modified',
-          additions: f.additions ?? 0,
-          deletions: f.deletions ?? 0,
-          changes: f.changes ?? 0,
-        });
-      }
-      sawFullPage = pageFiles.length >= 300;
-      if (pageFiles.length < 300) break;
+    const data = await this.request(() =>
+      this.octokit.rest.repos
+        .compareCommits({
+          owner: this.owner,
+          repo: this.repo,
+          base: baseSha,
+          head: headSha,
+          per_page: 300,
+          page: 1,
+        })
+        .then((r) => r.data),
+    );
+    const pageFiles = data.files ?? [];
+    for (const f of pageFiles) {
+      if (!f.filename) continue;
+      files.push({
+        path: f.filename,
+        status: f.status ?? 'modified',
+        additions: f.additions ?? 0,
+        deletions: f.deletions ?? 0,
+        changes: f.changes ?? 0,
+      });
     }
-    if (sawFullPage) {
-      truncated = true;
+    const truncated = pageFiles.length >= 300;
+    if (truncated) {
       notes.push(
-        'compare response reached the pagination limit; changed-file coverage may be partial',
+        'compare response reached GitHub\u2019s 300-file limit; changed-file coverage may be partial',
       );
     }
     return { files, truncated, notes };
@@ -148,12 +150,13 @@ export class GitHubClient {
 
   /**
    * Lists the files changed by a pull request. PR-scoped, so it works for
-   * cross-repository (fork) pull requests where compare may not.
+   * cross-repository (fork) pull requests where compare may not. Paginates at
+   * per_page=100 up to maxPages (GitHub caps PR files at 3000); hitting the
+   * cap is reported as truncated.
    */
   async listPullRequestFiles(prNumber: number, maxPages = 3): Promise<PullRequestFilesResult> {
     const files: ChangedFileInfo[] = [];
     const notes: string[] = [];
-    let truncated = false;
     let sawFullPage = false;
     for (let page = 1; page <= maxPages; page++) {
       const data = await this.request(() =>
@@ -180,10 +183,10 @@ export class GitHubClient {
       sawFullPage = data.length >= 100;
       if (data.length < 100) break;
     }
+    const truncated = sawFullPage;
     if (sawFullPage) {
-      truncated = true;
       notes.push(
-        'pull-request files response reached the pagination limit; changed-file coverage may be partial',
+        'pull-request files response reached the pagination cap; changed-file coverage may be partial',
       );
     }
     return { files, truncated, notes };

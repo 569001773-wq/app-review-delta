@@ -6,7 +6,8 @@ import { StaticExpoConfig, buildStaticExpoConfig } from '../parsers/expoConfig';
 export interface RuleMetadata {
   id: string;
   title: string;
-  category: 'privacy' | 'permissions' | 'network' | 'background' | 'secret' | 'sdk' | 'coverage';
+  category:
+    'privacy' | 'permissions' | 'network' | 'background' | 'secret' | 'sdk' | 'coverage' | 'config';
   defaultSeverity: 'ERROR' | 'WARNING' | 'INFO';
   defaultConfidence: 'HIGH' | 'MEDIUM' | 'LOW';
   officialSource: { title: string; url: string };
@@ -86,10 +87,10 @@ export interface PlistSource {
 export function listInfoPlistSources(snapshot: Snapshot): PlistSource[] {
   const out: PlistSource[] = [];
   for (const f of getPlistFiles(snapshot)) {
-    if (!f.path.endsWith('Info.plist') && !f.path.includes('/')) {
-      // Only named Info.plist or plists under a folder (ios/...) qualify.
-      continue;
-    }
+    // Only the app's Info.plist qualifies. Service/config plists (e.g.
+    // GoogleService-Info.plist) must not be fed to ATS/permission rules.
+    const basename = f.path.slice(f.path.lastIndexOf('/') + 1);
+    if (basename !== 'Info.plist') continue;
     const r = parsePlist(f.text);
     if (r.ok) out.push({ label: f.path, file: f.path, value: r.value });
     else out.push({ label: f.path, file: f.path, error: r.error });

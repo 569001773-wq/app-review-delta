@@ -241,6 +241,134 @@ MzEfYyjiWA4R4M2LBK9WDWT7FYBUIXvHZI4nT49KncYVH
     expect(findingsByRule(result, 'ARD006')).toHaveLength(0);
   });
 
+  it('15b. RevenueCat public API key (appl_) is NOT flagged', () => {
+    const head = {
+      ...cleanExpoApp(),
+      '.env': 'EXPO_PUBLIC_REVENUECAT_API_KEY=appl_ABC123def456GHI789jkl012mno345p\n',
+    };
+    const result = analyzeFixture(null, head);
+    expect(findingsByRule(result, 'ARD006')).toHaveLength(0);
+  });
+
+  it('21. privacy manifest removed entirely is ARD002 WARNING', () => {
+    const base = {
+      ...cleanExpoApp(),
+      'ios/Example/PrivacyInfo.xcprivacy': VALID_PRIVACY_MANIFEST,
+    };
+    const head = cleanExpoApp();
+    const result = analyzeFixture(base, head);
+    expect(findingsByRule(result, 'ARD002').some((f) => f.title.includes('removed'))).toBe(true);
+  });
+
+  it('22. collected-data entries missing required fields are ARD001 ERROR', () => {
+    const head = {
+      ...cleanExpoApp(),
+      'ios/Example/PrivacyInfo.xcprivacy': `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+  <key>NSPrivacyCollectedDataTypes</key>
+  <array>
+    <dict>
+      <key>NSPrivacyCollectedDataType</key>
+      <string>NSPrivacyCollectedDataTypeName</string>
+    </dict>
+  </array>
+</dict></plist>`,
+    };
+    const result = analyzeFixture(null, head);
+    const ard001 = findingsByRule(result, 'ARD001');
+    expect(
+      ard001.some((f) => f.title.includes('NSPrivacyCollectedDataTypeLinked is missing')),
+    ).toBe(true);
+    expect(
+      ard001.some((f) => f.title.includes('NSPrivacyCollectedDataTypeTracking is missing')),
+    ).toBe(true);
+    expect(
+      ard001.some((f) => f.title.includes('NSPrivacyCollectedDataTypePurposes is missing')),
+    ).toBe(true);
+  });
+
+  it('23. undocumented collection purpose is WARNING (lenient) / ERROR (strict)', () => {
+    const manifest = `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+  <key>NSPrivacyCollectedDataTypes</key>
+  <array>
+    <dict>
+      <key>NSPrivacyCollectedDataType</key>
+      <string>NSPrivacyCollectedDataTypeName</string>
+      <key>NSPrivacyCollectedDataTypeLinked</key><false/>
+      <key>NSPrivacyCollectedDataTypeTracking</key><false/>
+      <key>NSPrivacyCollectedDataTypePurposes</key>
+      <array><string>My Custom Purpose</string></array>
+    </dict>
+  </array>
+</dict></plist>`;
+    const head = { ...cleanExpoApp(), 'ios/Example/PrivacyInfo.xcprivacy': manifest };
+    const lenient = analyzeFixture(null, head);
+    expect(
+      findingsByRule(lenient, 'ARD001').some(
+        (f) => f.title.includes('not in the documented set') && f.severity === 'WARNING',
+      ),
+    ).toBe(true);
+    const strictCfg = defaultConfig();
+    strictCfg.reasonCodeMode = 'strict';
+    const strict = analyzeFixture(null, head, strictCfg);
+    expect(
+      findingsByRule(strict, 'ARD001').some(
+        (f) => f.title.includes('not in the documented set') && f.severity === 'ERROR',
+      ),
+    ).toBe(true);
+  });
+
+  it('24. non-string permission value is ARD004 ERROR', () => {
+    const head = {
+      ...cleanExpoApp(),
+      'ios/Example/Info.plist': `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+  <key>NSMicrophoneUsageDescription</key><true/>
+</dict></plist>`,
+    };
+    const result = analyzeFixture(null, head);
+    expect(
+      findingsByRule(result, 'ARD004').some(
+        (f) => f.severity === 'ERROR' && f.title.includes('must be a string'),
+      ),
+    ).toBe(true);
+  });
+
+  it('25. service plists such as GoogleService-Info.plist are not treated as Info.plist', () => {
+    const head = {
+      ...cleanExpoApp(),
+      'ios/App/GoogleService-Info.plist': `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+  <key>NSMicrophoneUsageDescription</key>
+  <string></string>
+</dict></plist>`,
+    };
+    const result = analyzeFixture(null, head);
+    expect(findingsByRule(result, 'ARD004')).toHaveLength(0);
+  });
+
+  it('26. new calendar/reminders permission keys are tracked', () => {
+    const head = {
+      ...cleanExpoApp(),
+      'ios/Example/Info.plist': `<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0"><dict>
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>Let you add events to your calendar.</string>
+  <key>NSRemindersFullAccessUsageDescription</key>
+  <string>Let you manage your reminders.</string>
+</dict></plist>`,
+    };
+    const result = analyzeFixture(null, head);
+    const ard004 = findingsByRule(result, 'ARD004');
+    expect(ard004.some((f) => f.title.includes('NSCalendarsFullAccessUsageDescription'))).toBe(
+      true,
+    );
+    expect(ard004.some((f) => f.title.includes('NSRemindersFullAccessUsageDescription'))).toBe(
+      true,
+    );
+  });
+
   it('16. EXPO_PUBLIC genuinely private provider credential IS flagged', () => {
     const head = {
       ...cleanExpoApp(),

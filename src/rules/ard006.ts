@@ -1,4 +1,4 @@
-import { CandidateFindingInput, Rule, RuleContext } from './shared';
+import { CandidateFindingInput, Rule, RuleContext, effectiveSeverity } from './shared';
 import { EXPO_PUBLIC_ASSIGNMENT, EXPO_PUBLIC_SECRETS, SECRET_PATTERNS } from './secretPatterns';
 import { findLine } from '../util/lineLookup';
 import { redactAssignment, redacted } from '../util/redact';
@@ -70,7 +70,7 @@ export const ARD006: Rule = {
         const redactedLine = redacted(line);
         out.push({
           title: `${pattern.label} committed`,
-          severity: 'ERROR',
+          severity: effectiveSeverity('ERROR', ctx.config, 'ARD006'),
           confidence: 'HIGH',
           category: 'secret',
           file: file.path,
@@ -103,7 +103,7 @@ export const ARD006: Rule = {
         const line = snippetAround(text, idx);
         out.push({
           title: `EXPO_PUBLIC variable contains a private credential (${hit.provider})`,
-          severity: 'ERROR',
+          severity: effectiveSeverity('ERROR', ctx.config, 'ARD006'),
           confidence: 'HIGH',
           category: 'secret',
           file: file.path,

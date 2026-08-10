@@ -1,7 +1,7 @@
 import { AppReviewConfig } from '../config/load';
 import { buildSnapshot, FileProvider, ChangedPathsProvider } from '../snapshots/buildSnapshot';
 import { Snapshot } from '../types';
-import { CompareResult, GitHubClient, PullRequestFilesResult } from './client';
+import { CompareResult, GitHubClient } from './client';
 
 export interface GitHubSnapshotInput {
   baseClient: GitHubClient;
@@ -9,28 +9,29 @@ export interface GitHubSnapshotInput {
   baseSha: string;
   headSha: string;
   config: AppReviewConfig;
-  /** Present on pull_request events; enables the cross-repository fallback. */
+  /** Present on pull_request events; selects the PR files API. */
   prNumber?: number;
 }
 
 /**
- * Builds base and head snapshots sharing a single compare call.
+ * Builds base and head snapshots sharing a single changed-file fetch.
  */
 export async function buildGitHubSnapshots(
   input: GitHubSnapshotInput,
 ): Promise<{ base: Snapshot; head: Snapshot }> {
   const { baseClient, headClient, baseSha, headSha, config, prNumber } = input;
 
-  let compare: CompareResult;
-  try {
-    compare = await baseClient.compareCommits(baseSha, headSha, config.maxComparePages);
-  } catch (err) {
-    if (prNumber === undefined) throw err;
-    // Cross-repository (fork) pull requests cannot always be compared on the
-    // base repository; the PR-scoped files API is the reliable fallback.
-    let prFiles: PullRequestFilesResult;
+  // The PR files API is the authoritative changed-file source: it is
+  // paginated (up to 3000 files) and works for cross-repository (fork) PRs.
+  // GitHub's compare endpoint caps at 300 files and is used only when no PR
+  // number is available.
+  const compare: CompareResult = await (async () => {
+    if (prNumber === undefined) {
+      return baseClient.compareCommits(baseSha, headSha);
+    }
     try {
-      prFiles = await baseClient.listPullRequestFiles(prNumber, config.maxComparePages);
+      const prFiles = await baseClient.listPullRequestFiles(prNumber, config.maxPrFilesPages);
+      return { files: prFiles.files, truncated: prFiles.truncated, notes: prFiles.notes };
     } catch (prErr) {
       const status = (prErr as { status?: number }).status ?? 0;
       throw new Error(
@@ -40,15 +41,7 @@ export async function buildGitHubSnapshots(
         { cause: prErr },
       );
     }
-    compare = {
-      files: prFiles.files,
-      truncated: prFiles.truncated,
-      notes: [
-        'used pull-request files API (cross-repository compare unavailable)',
-        ...prFiles.notes,
-      ],
-    };
-  }
+  })();
   const changedPaths = compare.files.map((f) => f.path);
 
   const provider: FileProvider & ChangedPathsProvider = {

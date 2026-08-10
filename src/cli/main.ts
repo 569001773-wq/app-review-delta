@@ -5,23 +5,11 @@ import { VERSION } from '../version';
 import { configFromText, defaultConfig } from '../config/load';
 import { ConfigError } from '../config/schema';
 import { analyze } from '../engine';
-import { buildGitSnapshots, buildGitWorkingSnapshot } from '../git/gitSnapshot';
+import { buildGitSnapshots, buildGitWorkingSnapshot, readGitFileAtRef } from '../git/gitSnapshot';
 import { formatJson } from '../reporting/json';
 import { formatMarkdown } from '../reporting/markdown';
 import { formatTerminal, failsOn, findingCounts } from '../reporting/terminal';
 import { RULES } from '../rules/registry';
-
-function loadConfig(
-  repoDir: string,
-  configPath: string | undefined,
-): ReturnType<typeof configFromText> {
-  const target = configPath
-    ? path.resolve(repoDir, configPath)
-    : path.join(repoDir, '.reviewdelta.yml');
-  if (!fs.existsSync(target)) return defaultConfig();
-  const text = fs.readFileSync(target, 'utf8');
-  return configFromText(text, target);
-}
 
 export async function runCli(argv: string[] = process.argv): Promise<void> {
   const program = new Command();
@@ -43,6 +31,11 @@ export async function runCli(argv: string[] = process.argv): Promise<void> {
     )
     .option('--repo <dir>', 'path to the git repository (default: current directory)')
     .option('--config <path>', 'path to .reviewdelta.yml (relative to the repository)')
+    .option(
+      '--config-ref <ref>',
+      'which revision supplies policy: base (default) | head | working',
+      'base',
+    )
     .option('--format <format>', 'output format: terminal | json | markdown', 'terminal')
     .option('--fail-on <level>', 'fail threshold: error | warning | never')
     .addOption(new Option('--no-color', 'disable ANSI colors'))
@@ -53,7 +46,7 @@ export async function runCli(argv: string[] = process.argv): Promise<void> {
       if (!fs.existsSync(path.join(repoDir, '.git'))) {
         throw new Error(`not a git repository: ${repoDir}`);
       }
-      const config = loadConfig(repoDir, opts.config);
+      const config = await loadConfig(repoDir, opts.base, opts.head, opts.config, opts.configRef);
       if (opts.failOn !== undefined) {
         if (!['error', 'warning', 'never'].includes(opts.failOn)) {
           throw new ConfigError('--fail-on must be one of: error, warning, never');
@@ -112,4 +105,35 @@ export async function runCli(argv: string[] = process.argv): Promise<void> {
     });
 
   await program.parseAsync(argv);
+}
+
+/**
+ * Loads the scanner policy. Default (and recommended): the BASE revision
+ * supplies policy so a diff cannot change the rules that gate its own check.
+ * An explicit --config path always wins (explicit user intent).
+ */
+async function loadConfig(
+  repoDir: string,
+  baseRef: string,
+  headRef: string,
+  explicitPath: string | undefined,
+  configRef: string,
+): Promise<ReturnType<typeof configFromText>> {
+  if (explicitPath) {
+    const target = path.resolve(repoDir, explicitPath);
+    if (!fs.existsSync(target)) throw new ConfigError(`config file not found: ${explicitPath}`);
+    return configFromText(fs.readFileSync(target, 'utf8'), target);
+  }
+  if (configRef === 'working') {
+    const target = path.join(repoDir, '.reviewdelta.yml');
+    if (!fs.existsSync(target)) return defaultConfig();
+    return configFromText(fs.readFileSync(target, 'utf8'), target);
+  }
+  if (configRef !== 'base' && configRef !== 'head') {
+    throw new ConfigError('--config-ref must be one of: base, head, working');
+  }
+  const ref = configRef === 'head' ? headRef : baseRef;
+  const file = await readGitFileAtRef(repoDir, ref, '.reviewdelta.yml');
+  if (file.text === null) return defaultConfig();
+  return configFromText(file.text, `.reviewdelta.yml (${configRef})`);
 }

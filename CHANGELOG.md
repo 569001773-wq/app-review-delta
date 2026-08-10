@@ -4,6 +4,28 @@ All notable changes to AppReviewDelta are documented here. The format follows [K
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-08-10
+
+### Security
+
+- **Scanner policy is now read from the BASE revision by default** (new `config-ref` input, default `base`). A PR can no longer disable rules, add suppressions, change severities, or set `fail-on: never` for its own check. PR-side policy changes are reported as a new informational rule (ARD009) and take effect only after merge.
+- **Fixed GitHub changed-files pagination.** The Action now uses the PR files API (paginated, up to 3000 files) as the primary changed-file source; the compare endpoint is used only without a PR number and a 300-file first page is always reported as truncated.
+- **RevenueCat public API keys (`appl_…`) are no longer flagged** as secrets (they are public by design; only private credentials are ERROR).
+- **Fixed local CLI symlink protection**: working-tree reads now use `lstat` and verify `realpath` stays inside the repository.
+- **Expo `app.config.js/ts` wrapper handling hardened**: only `defineConfig` imported from `expo/…` is unwrapped; arbitrary wrapper calls are treated as unresolvable.
+
+### Rules
+
+- ARD002 now reports a privacy manifest **removed entirely** by the PR.
+- ARD001 validates the full collected-data dictionary: required `NSPrivacyCollectedDataTypeLinked`, `NSPrivacyCollectedDataTypeTracking`, and `NSPrivacyCollectedDataTypePurposes` fields, plus documented purpose values (lenient/strict).
+- ARD004 now reports non-string usage-description values (ERROR) and tracks `NSCalendarsFullAccessUsageDescription`, `NSCalendarsWriteOnlyAccessUsageDescription`, and `NSRemindersFullAccessUsageDescription`.
+- ARD004/ARD006/ARD007/ARD008 now honor per-rule severity overrides like the other rules; ARD009 (new, INFO) reports scanner-policy changes.
+- Info.plist detection now requires the exact `Info.plist` basename; service plists (e.g., `GoogleService-Info.plist`) are excluded.
+
+### Tests
+
+- Added regression tests for compare/PR-files pagination (would have caught the P0), base-first policy resolution, symlink escape, `defineConfig` whitelist, manifest removal, collected-data validation, RevenueCat public keys, permission type errors, new permission keys, and severity overrides. Suite: 101 tests.
+
 ## [1.0.3] - 2026-08-10
 
 ### Fixed

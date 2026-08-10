@@ -1,4 +1,4 @@
-import { CandidateFindingInput, Rule, RuleContext } from './shared';
+import { CandidateFindingInput, Rule, RuleContext, effectiveSeverity } from './shared';
 import { matchSdkCategory } from './sdkCategories';
 import { Snapshot } from '../types';
 
@@ -54,7 +54,7 @@ export const ARD007: Rule = {
       for (const m of matches) {
         out.push({
           title: `Review-sensitive SDK added (${m.category})`,
-          severity: 'INFO',
+          severity: effectiveSeverity('INFO', ctx.config, 'ARD007'),
           confidence: 'HIGH',
           category: 'sdk',
           file: 'package.json',

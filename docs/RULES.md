@@ -30,7 +30,7 @@ Severity levels: `ERROR` (fails CI by default), `WARNING` (never fails by defaul
 2. Validate the root is a dictionary; `NSPrivacyTracking` is a boolean; `NSPrivacyTrackingDomains` is a non-empty list of domain strings when tracking is enabled.
 3. Validate `NSPrivacyAccessedAPITypes` is an array of dictionaries, each with a string `NSPrivacyAccessedAPIType` and a non-empty array-of-strings `NSPrivacyAccessedAPITypeReasons`.
 4. Validate reason-code format (`^[A-Z0-9]{2,6}\.[0-9]{1,2}$`). Reason codes outside the documented set (per the 2026-08-10 Apple page) are `WARNING MEDIUM` in lenient mode and `ERROR HIGH` in strict mode, because Apple updates this list.
-5. Validate `NSPrivacyCollectedDataTypes` structurally (data type present and string, linked/tracking booleans, purposes array).
+5. Validate `NSPrivacyCollectedDataTypes` entries fully: `NSPrivacyCollectedDataType` (required string), `NSPrivacyCollectedDataTypeLinked` (required Boolean), `NSPrivacyCollectedDataTypeTracking` (required Boolean), and `NSPrivacyCollectedDataTypePurposes` (required array of strings from Apple's documented purpose list; unknown values are `WARNING MEDIUM` in lenient mode and `ERROR HIGH` in strict mode).
 6. Unknown top-level keys are `INFO LOW`.
 
 **False-positive considerations:** The category/reason table is versioned (`PRIVACY_ACCESSED_LAST_VERIFIED = 2026-08-10`); Apple explicitly says the list is continually reviewed. Domain-format checks are heuristic (`WARNING` only). Never invented schema requirements: only rules Apple documents are enforced as ERROR.
@@ -85,6 +85,7 @@ ARD002 never claims the new state is invalid — that is ARD001's job.
 
 **Detection logic:** Tracks the documented `NS*UsageDescription` keys across Info.plist sources and statically resolvable `expo.ios.infoPlist`:
 
+- non-string value for a usage-description key → `ERROR HIGH` (Apple defines these keys as strings);
 - new permission key → `INFO HIGH` ("permission surface introduced");
 - empty or whitespace-only value → `WARNING HIGH`;
 - placeholder value (known placeholder phrases) → `WARNING HIGH`;
@@ -94,6 +95,8 @@ ARD002 never claims the new state is invalid — that is ARD001's job.
 Each finding distinguishes **fact** ("This PR adds NSMicrophoneUsageDescription.") from **heuristic** ("The wording may be too generic for the actual use case.").
 
 **False-positive considerations:** Merely importing `expo-camera` without a usage description is not reported (API use cannot be proven statically). Boilerplate strings are only flagged as heuristics, never ERROR. Generic-wording detection is deliberately narrow to avoid noise.
+
+Tracked keys include the current protected-resource set: camera, microphone, photo library (read and add), location (when-in-use and always), contacts, tracking (ATT), Bluetooth, calendars (`NSCalendarsUsageDescription`, `NSCalendarsFullAccessUsageDescription`, `NSCalendarsWriteOnlyAccessUsageDescription`), reminders (`NSRemindersUsageDescription`, `NSRemindersFullAccessUsageDescription`), motion, speech recognition, Face ID, health share/update, local network, media library, Siri, and video subscriber accounts.
 
 ---
 
@@ -131,7 +134,7 @@ Each finding distinguishes **fact** ("This PR adds NSMicrophoneUsageDescription.
 
 All evidence is redacted (`EXPO_PUBLIC_OPENAI_API_KEY=<redacted>`), never the raw value.
 
-**False-positive considerations:** Variables named `API_KEY` alone are not evidence. Stripe publishable keys, Google/Firebase API keys, Sentry DSNs, and other intentionally public client identifiers are never flagged.
+**False-positive considerations:** Variables named `API_KEY` alone are not evidence. Stripe publishable keys, Google/Firebase API keys, Sentry DSNs, RevenueCat public API keys (`appl_…`, which are public by design), and other intentionally public client identifiers are never flagged.
 
 ---
 
@@ -167,6 +170,27 @@ All evidence is redacted (`EXPO_PUBLIC_OPENAI_API_KEY=<redacted>`), never the ra
 - unparsable plist/config sources.
 
 **False-positive considerations:** A gap is not a compliance problem; it is an honest limitation and never blocks CI.
+
+---
+
+## ARD009 — Scanner Policy Changed in PR
+
+- **Default severity:** INFO
+- **Default confidence:** HIGH
+- **Category:** config
+- **Official source:** [docs/SECURITY_MODEL.md](SECURITY_MODEL.md)
+
+**Paraphrase:** The scanner policy (`.reviewdelta.yml`) is read from the BASE revision so a PR cannot change the rules that gate its own check; a policy change in the PR is reported for transparency and takes effect only after merge.
+
+**Detection logic:** Compares `.reviewdelta.yml` between BASE and HEAD and reports added, removed, or changed policy. The current check always uses the BASE policy (or defaults when the base has none); `config-ref: head` opts into untrusted PR-controlled policy explicitly.
+
+**False-positive considerations:** Intentional policy changes (for example adding a suppression with a reason) are expected; the finding is informational and never blocks CI.
+
+---
+
+## Severity overrides
+
+Every rule honors per-rule `severity` overrides from the configuration (`rules.<ID>.severity`), including ARD002, ARD006, ARD007, ARD008, and ARD009.
 
 ---
 

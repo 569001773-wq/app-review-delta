@@ -88,11 +88,6 @@ export const EXPO_PUBLIC_SECRETS: { provider: string; namePart: RegExp; valuePar
     namePart: /APPLE/i,
     valuePart: /-----BEGIN PRIVATE KEY-----/,
   },
-  {
-    provider: 'RevenueCat',
-    namePart: /REVENUECAT/i,
-    valuePart: /^appl_[A-Za-z0-9]{20,}$/,
-  },
 ];
 
 /** Matches any EXPO_PUBLIC_* assignment line. */

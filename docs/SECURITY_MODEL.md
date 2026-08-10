@@ -4,17 +4,18 @@
 
 ## Design invariants
 
-1. **No target checkout.** The Action does not check out or clone the target repository. It reads the `pull_request` event payload, the compare response (or the PR files API for fork PRs), and individual file contents through the GitHub REST API. Head-side reads are routed to the fork repository (`pull_request.head.repo`) when the PR comes from a fork. If the workflow token cannot read the fork (for example a private fork), the check stops with a clear, actionable message instead of reporting partial results.
-2. **Target code is data.** No target file is ever executed, imported, `require`d, or `eval`ed. Configuration files are parsed as syntax trees or data:
+1. **No target checkout.** The Action does not check out or clone the target repository. It reads the `pull_request` event payload, the PR files API (paginated, up to 3000 files; the compare endpoint is used only when no PR number is available and is reported as truncated at 300 files), and individual file contents through the GitHub REST API. Head-side reads are routed to the fork repository (`pull_request.head.repo`) when the PR comes from a fork. If the workflow token cannot read the fork (for example a private fork), the check stops with a clear, actionable message instead of reporting partial results.
+2. **Policy comes from the trusted base.** The scanner policy (`.reviewdelta.yml`) is read from the BASE revision by default, so a PR cannot disable rules, add suppressions, change severities, or set `fail-on: never` for its own check. PR-side policy changes are reported (ARD009) and take effect only after merge. `config-ref: head` opts into untrusted PR-controlled policy explicitly.
+3. **Target code is data.** No target file is ever executed, imported, `require`d, or `eval`ed. Configuration files are parsed as syntax trees or data:
    - XML plists via a DOM-style parser with a tag-balance guard;
    - JSON via `JSON.parse`;
    - YAML via the `yaml` package (safe parse);
    - `app.config.js`/`app.config.ts` via a Babel AST and a strict literal evaluator.
-3. **Read-only credentials.** The Action requests `contents: read` and `pull-requests: read` only. It never asks for write permissions, secrets, or an API key.
-4. **No external data flow.** No telemetry, analytics, tracking, backend, cloud database, or third-party AI service. The only network endpoints are GitHub API endpoints needed to read the PR/repository (and the user's own runner for the Action itself).
-5. **Scoped fetch.** Only a small documented set of relevant paths is fetched, each bounded by `max-file-size-bytes` (default 2 MiB). Binary files, symlinks, and oversized files are skipped and reported as coverage gaps.
-6. **Secret hygiene.** ARD006 evidence is aggressively redacted by a dedicated redactor before any reporter sees it. No secret value is ever written to logs, summaries, or JSON output.
-7. **Coverage honesty.** API truncation, parse failures, dynamic config, and inaccessible content are reported as ARD008 gaps. The tool never claims complete analysis it did not perform.
+4. **Read-only credentials.** The Action requests `contents: read` and `pull-requests: read` only. It never asks for write permissions, secrets, or an API key.
+5. **No external data flow.** No telemetry, analytics, tracking, backend, cloud database, or third-party AI service. The only network endpoints are GitHub API endpoints needed to read the PR/repository (and the user's own runner for the Action itself).
+6. **Scoped fetch.** Only a small documented set of relevant paths is fetched, each bounded by `max-file-size-bytes` (default 2 MiB). Binary files, symlinks, and oversized files are skipped and reported as coverage gaps.
+7. **Secret hygiene.** ARD006 evidence is aggressively redacted by a dedicated redactor before any reporter sees it. No secret value is ever written to logs, summaries, or JSON output.
+8. **Coverage honesty.** API truncation, parse failures, dynamic config, and inaccessible content are reported as ARD008 gaps. The tool never claims complete analysis it did not perform.
 
 ## What the Action executes
 

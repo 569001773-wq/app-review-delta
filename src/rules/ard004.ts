@@ -25,7 +25,10 @@ const TRACKED_KEYS = [
   'NSUserTrackingUsageDescription',
   'NSBluetoothAlwaysUsageDescription',
   'NSCalendarsUsageDescription',
+  'NSCalendarsFullAccessUsageDescription',
+  'NSCalendarsWriteOnlyAccessUsageDescription',
   'NSRemindersUsageDescription',
+  'NSRemindersFullAccessUsageDescription',
   'NSMotionUsageDescription',
   'NSSpeechRecognitionUsageDescription',
   'NSFaceIDUsageDescription',
@@ -52,10 +55,9 @@ function classify(v: string): { cls: ValueClass; heuristic: boolean } {
   return { cls: 'explicit', heuristic: false };
 }
 
-function permissionValue(plist: PlistValue | undefined, key: string): string | undefined {
+function permissionValue(plist: PlistValue | undefined, key: string): PlistValue | undefined {
   if (!isDictValue(plist)) return undefined;
-  const v = plist[key];
-  return typeof v === 'string' ? v : undefined;
+  return plist[key];
 }
 
 export const ARD004: Rule = {
@@ -89,8 +91,33 @@ export const ARD004: Rule = {
         const headValue = permissionValue(plist, key);
         const baseValue = permissionValue(basePlist, key);
         if (headValue === undefined) continue;
+
+        // Apple defines every tracked NS*UsageDescription as a string; a
+        // non-string value is an objectively invalid configuration.
+        if (typeof headValue !== 'string') {
+          out.push({
+            title: `${key} must be a string`,
+            severity: effectiveSeverity('ERROR', ctx.config, 'ARD004'),
+            confidence: 'HIGH',
+            category: 'permissions',
+            file: src.file,
+            evidence: `fact: ${key} in ${src.label} has type ${typeof headValue}; Apple defines it as a string.`,
+            headState: String(headValue),
+            whyItMatters:
+              'A non-string usage description is structurally invalid and cannot display as the permission prompt.',
+            suggestedAction: 'Set the key to a string that tells people why access is requested.',
+            officialSource: SOURCE,
+            semanticKey: `permission-type:${key}`,
+            valueClass: 'non-string',
+          });
+          continue;
+        }
+
         const headCls = classify(headValue);
-        const baseCls = baseValue === undefined ? undefined : classify(baseValue);
+        const baseCls =
+          baseValue === undefined || typeof baseValue !== 'string'
+            ? undefined
+            : classify(baseValue);
 
         if (baseValue === undefined) {
           // New permission surface.
@@ -125,7 +152,7 @@ export const ARD004: Rule = {
             category: 'permissions',
             file: src.file,
             evidence: `fact: ${key} changed in ${src.label}.`,
-            baseState: baseValue,
+            baseState: typeof baseValue === 'string' ? baseValue : undefined,
             headState: headValue === '' ? '(empty string)' : headValue,
             whyItMatters:
               'Apple requires a message that tells people why the app requests access; an empty or placeholder string fails that purpose.',
@@ -157,7 +184,8 @@ export const ARD004: Rule = {
         // Wording change between two explicit strings.
         if (baseValue !== undefined && baseCls?.cls === 'explicit' && headCls.cls === 'explicit') {
           // Wording changed but quality class unchanged.
-          const normBase = (baseValue ?? '').trim().replace(/\s+/g, ' ');
+          const baseStr = typeof baseValue === 'string' ? baseValue : '';
+          const normBase = baseStr.trim().replace(/\s+/g, ' ');
           const normHead = headValue.trim().replace(/\s+/g, ' ');
           if (normBase !== normHead) {
             out.push({
@@ -167,7 +195,7 @@ export const ARD004: Rule = {
               category: 'permissions',
               file: src.file,
               evidence: `fact: the purpose string for ${key} changed in ${src.label}.`,
-              baseState: baseValue,
+              baseState: typeof baseValue === 'string' ? baseValue : undefined,
               headState: headValue,
               whyItMatters:
                 'A changed purpose string is review-sensitive; it should accurately describe the permission use.',
